@@ -11,6 +11,11 @@ export default function Publicity() {
 
 const committeeMembers = [
   {
+    name: "Dr. Prashant Johri",
+    role: "Publicity Chair",
+    affiliation: "Galgotias University, Greater Noida, India",
+  },
+  {
     name: "Dr. Chiranji Lal Chowdhary",
     role: "Publicity Chair",
     affiliation: "Vellore Institute of Technology, Vellore, India",
