@@ -39,7 +39,7 @@ export default function IEEEPDFExpress() {
 
                 <div>
                   <h4 className="font-bold text-gray-900">Conference ID:</h4>
-                  <p>Will be provided</p>
+                  <p>64788X</p>
                 </div>
 
                 <div>
