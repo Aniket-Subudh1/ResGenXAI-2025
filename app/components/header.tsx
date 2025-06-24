@@ -21,6 +21,7 @@ export default function Header() {
   const menuItems = [
     { name: "Home", href: "/" },
     { name: "Call for Papers", href: "/call-for-papers" },
+    { name: "Special Sessions", href: "/special-sessions" }, // Added missing comma here
     {
       name: "Guidelines",
       href: "#",

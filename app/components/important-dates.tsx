@@ -11,25 +11,25 @@ export default function ImportantDates() {
 
   const dates = [
     {
-      date: "20th June, 2025",
+      date: "20th July, 2025 (Hard Deadline)",
       title: "Final Submission of manuscripts for review",
       description: "(Full Paper)",
       icon: FileCheck,
     },
     {
-      date: "20th July, 2025",
+      date: "11th August, 2025",
       title: "Acceptance Notification",
       description: "",
       icon: Bell,
     },
     {
-      date: "10th August, 2025",
+      date: "20th August, 2025",
       title: "Camera ready paper submission",
       description: "",
       icon: Calendar,
     },
     {
-      date: "20th August, 2025",
+      date: "25th August, 2025",
       title: "Last Date of Registration",
       description: "",
       icon: Users,
