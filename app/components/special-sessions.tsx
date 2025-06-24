@@ -162,7 +162,7 @@ export default function SpecialSessions() {
               <p>
                 After submission, forward to:{' '}
                 <span className="font-mono bg-white/20 px-2 py-1 rounded text-white text-sm">
-                  amrutanshupanigrahi@soa.ac.in, abhilash.pati@soa.ac.in
+                amrutanshupanigrahi@soa.ac.in, abhilash.pati@soa.ac.in
                 </span>
               </p>
               <p>
