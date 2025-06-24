@@ -117,18 +117,18 @@ export default function SpecialSessions() {
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
               <div className="w-1 h-8 bg-blue-400 mr-3"></div>
-              Organizers
+              Session Organizers
             </h2>
             <div className="space-y-4">
               <div className="border-l-2 border-blue-400 pl-4">
                 <h3 className="text-lg font-semibold text-white">Dr. Amrutanshu Panigrahi</h3>
                 <p className="text-blue-100">Assistant Professor, Department of CSE</p>
-                <p className="text-blue-100">SOA University, Bhubaneswar, India</p>
+                <p className="text-blue-100">SoA University, Bhubaneswar, India</p>
               </div>
               <div className="border-l-2 border-blue-400 pl-4">
                 <h3 className="text-lg font-semibold text-white">Dr. Abhilash Pati</h3>
                 <p className="text-blue-100">Assistant Professor, Department of CSE</p>
-                <p className="text-blue-100">SOA University, Bhubaneswar, India</p>
+                <p className="text-blue-100">SoA University, Bhubaneswar, India</p>
                 <p className="text-blue-200 text-sm">Email: abhilashpati@soa.ac.in</p>
               </div>
             </div>
