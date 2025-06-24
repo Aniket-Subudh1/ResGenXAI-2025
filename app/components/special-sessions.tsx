@@ -110,6 +110,70 @@ export default function SpecialSessions() {
             This special session aims to explore cutting-edge innovations and practical applications at the intersection of these transformative technologies. IoT facilitates seamless data collection and connectivity among devices, while AI leverages this data for intelligent decision-making and automation. XAI ensures transparency, trust, and accountability in AI-driven systems—an increasingly critical requirement across sectors. The session welcomes original research, case studies, and visionary perspectives on the integration of IoT, AI, and XAI in various domains. 
           </p>
         </div>
+
+        {/* Organizers and Submission Details */}
+        <div className="max-w-4xl mx-auto mt-16 grid md:grid-cols-2 gap-8 relative z-10">
+          {/* Organizers Section */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+              <div className="w-1 h-8 bg-blue-400 mr-3"></div>
+              Organizers
+            </h2>
+            <div className="space-y-4">
+              <div className="border-l-2 border-blue-400 pl-4">
+                <h3 className="text-lg font-semibold text-white">Dr. Amrutanshu Panigrahi</h3>
+                <p className="text-blue-100">Assistant Professor, Department of CSE</p>
+                <p className="text-blue-100">SOA University, Bhubaneswar, India</p>
+              </div>
+              <div className="border-l-2 border-blue-400 pl-4">
+                <h3 className="text-lg font-semibold text-white">Dr. Abhilash Pati</h3>
+                <p className="text-blue-100">Assistant Professor, Department of CSE</p>
+                <p className="text-blue-100">SOA University, Bhubaneswar, India</p>
+                <p className="text-blue-200 text-sm">Email: abhilashpati@soa.ac.in</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Paper Submission Section */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+              <div className="w-1 h-8 bg-blue-400 mr-3"></div>
+              Paper Submission
+            </h2>
+            <div className="space-y-4 text-blue-100">
+              <p>
+                The manuscript template can be found at{' '}
+                <a href="https://www.resgenxai.co.in/authorguidelines" className="text-blue-300 hover:text-blue-200 underline transition-colors">
+                  resgenxai.co.in/authorguidelines
+                </a>
+              </p>
+              <p>
+                All manuscripts should be renamed as:{' '}
+                <span className="font-mono bg-white/20 px-2 py-1 rounded text-white">
+                  ResGenXAI_2025_ManuscriptShortTitle_SS01
+                </span>
+              </p>
+              <p>
+                Submit using the Microsoft CMT link at{' '}
+                <a href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025" className="text-blue-300 hover:text-blue-200 underline transition-colors">
+                  Be an Author
+                </a>
+              </p>
+              <p>
+                After submission, forward to:{' '}
+                <span className="font-mono bg-white/20 px-2 py-1 rounded text-white text-sm">
+                  amrutanshupanigrahi@soa.ac.in, abhilash.pati@soa.ac.in
+                </span>
+              </p>
+              <p>
+                Registration details:{' '}
+                <a href="https://www.resgenxai.co.in/" className="text-blue-300 hover:text-blue-200 underline transition-colors">
+                  resgenxai.co.in
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Wave divider */}
