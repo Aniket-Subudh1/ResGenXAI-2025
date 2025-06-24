@@ -85,6 +85,15 @@ export default function TracksList() {
         "Responsible and Explainable Signal AI",
       ],
     },
+    {
+      id: "SpecialTrack",
+      title: "Special Track: Explainable and Scalable AI Models for Real-Time Decision-Making in Distributed IoT Ecosystems",
+      icon: Waveform,
+      color: "from-orange-500 to-red-500",
+      topics: [
+        "This special session aims to explore cutting-edge innovations and practical applications at the intersection of these transformative technologies. IoT facilitates seamless data collection and connectivity among devices, while AI leverages this data for intelligent decision-making and automation. XAI ensures transparency, trust, and accountability in AI-driven systems—an increasingly critical requirement across sectors. The session welcomes original research, case studies, and visionary perspectives on the integration of IoT, AI, and XAI in various domains. ",
+      ],
+    },
   ]
 
   return (
