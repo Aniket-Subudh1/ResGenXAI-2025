@@ -15,6 +15,8 @@ interface RegistrationData {
   paperId: string
   copyrightAgreement: string
   presentationMode: string
+  baseFee: number
+  gstAmount: number
   calculatedFee: number
   currency: string
   paymentProofUrl?: string
@@ -36,21 +38,18 @@ export async function POST(request: NextRequest) {
       registrationData,
     } = await request.json()
 
-    // Validate required payment fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json({ 
         error: 'Missing payment verification data' 
       }, { status: 400 })
     }
 
-    // Validate registration data
     if (!registrationData || !registrationData.participantName || !registrationData.email) {
       return NextResponse.json({ 
         error: 'Invalid registration data' 
       }, { status: 400 })
     }
 
-    // Verify Razorpay signature
     const body = razorpay_order_id + '|' + razorpay_payment_id
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
@@ -63,12 +62,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Connect to database
     const client = await clientPromise
     const db = client.db('conference')
     const registrations = db.collection('registrations')
 
-    // Check for duplicate registration by email or payment ID
     const existingRegistration = await registrations.findOne({
       $or: [
         { email: registrationData.email },
@@ -82,55 +79,48 @@ export async function POST(request: NextRequest) {
       }, { status: 409 })
     }
 
-    // Generate unique registration ID
     const registrationId = generateRegistrationId()
 
-    // Prepare complete registration record with all real data
     const registrationRecord = {
-      // Personal Information
       participantName: registrationData.participantName.trim(),
       email: registrationData.email.toLowerCase().trim(),
       mobileNumber: registrationData.mobileNumber.trim(),
       whatsappNumber: registrationData.whatsappNumber.trim(),
       country: registrationData.country.trim(),
       
-      // Registration Details
       category: registrationData.category,
       ieeeStatus: registrationData.ieeeStatus,
       nationality: registrationData.nationality,
       
-      // Paper Information
       paperId: registrationData.paperId.trim(),
       copyrightAgreement: registrationData.copyrightAgreement,
       presentationMode: registrationData.presentationMode,
       
-      // Payment Information
+      baseFee: registrationData.baseFee || 0,
+      gstAmount: registrationData.gstAmount || 0,
       calculatedFee: registrationData.calculatedFee,
       currency: registrationData.currency,
       paymentId: razorpay_payment_id,
       orderId: razorpay_order_id,
       paymentStatus: 'completed',
       
-      // File URLs (if any)
       paymentProofUrl: registrationData.paymentProofUrl || null,
       ieeeProofUrl: registrationData.ieeeProofUrl || null,
       
-      // System Information
       registrationId,
       registrationDate: new Date(),
       
-      // Metadata for tracking
       metadata: {
         userAgent: request.headers.get('user-agent') || 'unknown',
         ipAddress: request.headers.get('x-forwarded-for') || 
                   request.headers.get('x-real-ip') || 
                   'unknown',
         paymentTimestamp: new Date().toISOString(),
-        source: 'web'
+        source: 'web',
+        gstApplicable: registrationData.gstAmount > 0
       }
     }
 
-    // Insert registration record
     const insertResult = await registrations.insertOne(registrationRecord)
     
     if (!insertResult.acknowledged) {
@@ -141,19 +131,20 @@ export async function POST(request: NextRequest) {
       registrationId,
       participantName: registrationData.participantName,
       email: registrationData.email,
-      paymentId: razorpay_payment_id
+      paymentId: razorpay_payment_id,
+      baseFee: registrationData.baseFee,
+      gstAmount: registrationData.gstAmount,
+      totalAmount: registrationData.calculatedFee
     })
 
-    // Send confirmation email with real data
     try {
       await sendConfirmationEmail(registrationRecord)
       console.log('Confirmation email sent to:', registrationData.email)
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError)
-      // Don't fail the registration if email fails
+
     }
 
-    // Return success response with registration details
     return NextResponse.json({ 
       success: true, 
       registrationId: registrationRecord.registrationId,
@@ -161,7 +152,9 @@ export async function POST(request: NextRequest) {
       participantName: registrationData.participantName,
       email: registrationData.email,
       paymentId: razorpay_payment_id,
-      amount: `${registrationData.calculatedFee} ${registrationData.currency}`
+      amount: `${registrationData.calculatedFee} ${registrationData.currency}`,
+      gstAmount: registrationData.gstAmount,
+      baseFee: registrationData.baseFee
     })
 
   } catch (error) {

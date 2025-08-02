@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     // Generate PDF buffer
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

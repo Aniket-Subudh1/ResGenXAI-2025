@@ -50,6 +50,8 @@ interface Registration {
   paperId: string
   copyrightAgreement: string
   presentationMode: string
+  baseFee: number
+  gstAmount: number
   calculatedFee: number
   currency: string
   paymentStatus: string
@@ -64,12 +66,15 @@ interface DashboardData {
   totalRegistrations: number
   completedPayments: number
   totalAmount: number
+  totalGSTAmount: number
+  totalBaseAmount: number
   categoryBreakdown: Record<string, number>
   ieeeBreakdown: Record<string, number>
   nationalityBreakdown: Record<string, number>
   paymentStatusBreakdown: Record<string, number>
   presentationModeBreakdown: Record<string, number>
   countryBreakdown: Record<string, number>
+  gstBreakdown: Record<string, number>
   recentRegistrations: Registration[]
   allRegistrations: Registration[]
   dailyRegistrations: Record<string, number>
@@ -82,6 +87,8 @@ interface DetailViewProps {
 }
 
 const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => {
+  const hasGST = registration.gstAmount && registration.gstAmount > 0
+  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -195,7 +202,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
             </CardContent>
           </Card>
 
-          {/* Payment Information */}
+          {/* Payment Information with GST Details */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -204,12 +211,38 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Registration Fee</Label>
-                <p className="text-2xl font-bold text-primary">
-                  {registration.calculatedFee} {registration.currency}
-                </p>
-              </div>
+              {hasGST ? (
+                <div className="bg-blue-50 p-3 rounded-lg border">
+                  <Label className="text-sm font-medium text-gray-600">Fee Breakdown</Label>
+                  <div className="mt-2 space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Base Fee:</span>
+                      <span>{registration.baseFee || registration.calculatedFee} {registration.currency}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>GST (18%):</span>
+                      <span>+{Math.round(registration.gstAmount)} {registration.currency}</span>
+                    </div>
+                    <div className="border-t pt-1">
+                      <div className="flex justify-between font-semibold">
+                        <span>Total Amount:</span>
+                        <span className="text-lg text-primary">
+                          {registration.calculatedFee} {registration.currency}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Registration Fee</Label>
+                  <p className="text-2xl font-bold text-primary">
+                    {registration.calculatedFee} {registration.currency}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">No GST applicable (International)</p>
+                </div>
+              )}
+              
               <div>
                 <Label className="text-sm font-medium text-gray-600">Payment Status</Label>
                 <div className="flex items-center gap-2">
@@ -223,6 +256,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   </Badge>
                 </div>
               </div>
+              
               {registration.paymentId && (
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Payment ID</Label>
@@ -231,6 +265,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   </p>
                 </div>
               )}
+              
               {registration.orderId && (
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Order ID</Label>
@@ -239,6 +274,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   </p>
                 </div>
               )}
+              
               <div>
                 <Label className="text-sm font-medium text-gray-600">Registration Date</Label>
                 <div className="flex items-center gap-2">
@@ -303,6 +339,16 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                 <div>
                   <Label className="text-sm font-medium text-gray-600">IEEE Membership Proof</Label>
                   <p className="text-gray-500 text-sm">Not applicable (Non-IEEE member)</p>
+                </div>
+              )}
+              
+              {hasGST && (
+                <div className="bg-green-50 p-2 rounded border">
+                  <Label className="text-sm font-medium text-green-800">GST Information</Label>
+                  <p className="text-xs text-green-700 mt-1">
+                    GST of {Math.round(registration.gstAmount)} {registration.currency} has been applied as per Indian tax regulations.
+                    This registration serves as a GST invoice.
+                  </p>
                 </div>
               )}
             </CardContent>
