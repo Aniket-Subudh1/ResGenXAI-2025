@@ -21,7 +21,7 @@ export default function Header() {
   const menuItems = [
     { name: "Home", href: "/" },
     { name: "Call for Papers", href: "/call-for-papers" },
-    { name: "Special Sessions", href: "/special-sessions" }, // Added missing comma here
+    { name: "Special Sessions", href: "/special-sessions" },
     {
       name: "Guidelines",
       href: "#",
@@ -36,12 +36,12 @@ export default function Header() {
         { name: "Code of Conduct", href: "/attend" },
       ], },
     { name: "Committees", href: "/committees" },
+    { name: "Registration", href: "/registration" },
     { name: "Sight Seeing", href: "/sight-seeing" },
   ]
 
   return (
     <>
-      {/* Add a spacer element to prevent content from being hidden under the fixed header */}
       <div className="h-36"></div>
       
       <header
@@ -50,7 +50,6 @@ export default function Header() {
         }`}
       >
         <div className="container mx-auto px-4 py-2">
-          {/* Top header with logos */}
           <div className="flex justify-between items-center border-b border-primary/20 pb-2 mb-2">
             <div className="flex items-center">
               <div className="relative h-14 w-44">
@@ -58,7 +57,6 @@ export default function Header() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {/* IEEE Logo */}
               <div className="relative h-[50px] w-[100px] ">
                 <Image 
                   src="/ie.png" 
@@ -75,10 +73,8 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Main navigation */}
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              {/* Adjusted dimensions for landscape logo */}
               <div className="relative w-24 h-12 md:w-32 md:h-10">
                 <Image
                   src="/rs.png"
@@ -92,7 +88,6 @@ export default function Header() {
                 <h2 className="text-sm md:text-base font-bold text-gray-900">
                   International Conference on Responsible, Generative and Explainable AI
                 </h2>
-              
               </div>
             </div>
 
@@ -112,11 +107,9 @@ export default function Header() {
                   <div key={index} className="relative group">
                     {item.submenu ? (
                       <>
-                        {/* Enhanced submenu trigger with larger hover area */}
                         <button className="text-gray-800 hover:text-primary transition-colors duration-300 text-sm md:text-base whitespace-nowrap px-3 py-2 rounded-md hover:bg-primary/10 group-hover:text-primary group-hover:bg-primary/10">
                           {item.name}
                         </button>
-                        {/* Improved submenu with padding to prevent disappearing during mouse movement */}
                         <div className="absolute left-0 mt-0 pt-2 w-48 hidden group-hover:block z-50">
                           <div className="bg-white shadow-lg rounded-md overflow-hidden">
                             {item.submenu.map((subitem, subindex) => (
@@ -144,11 +137,15 @@ export default function Header() {
                   </div>
                 ))}
                 <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-2 md:ml-2">
-                 <Link href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025">
-                  <Button className="bg-primary hover:bg-primary-600 text-white">Submit Paper</Button>
-               </Link>
+                  <Link href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025">
+                    <Button className="bg-primary hover:bg-primary-600 text-white">Submit Paper</Button>
+                  </Link>
+                  <Link href="/registration">
+                    <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+                      Register Now
+                    </Button>
+                  </Link>
                 </div>
-                
               </div>
             </nav>
 
