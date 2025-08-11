@@ -11,7 +11,11 @@ export default function Local() {
 
 const committeeMembers = [
   { "name": "Dr. Nagesh Kolagani", "affiliation": "CUTM, A.P." },
+  { "name": "Dr. Amrutanshu Panigrahi", "affiliation": "SoA University, Bhubaneswar" },
+  { "name": "Dr. Abhilash Pati", "affiliation": "SoA University, Bhubaneswar" },
   { "name": "Dr. Mihir Narayan Mohanty", "affiliation": "SoA University, Bhubaneswar" },
+  { "name": "Dr. Deepak Kumar Panda", "affiliation": "Galgotias University, Greater Noida"},
+  { "name": "Dr. Soumya Snigdha Mohapatra", "affiliation": "Pillai College of Engineering, Navi Mumbai"},
   { "name": "Dr. Sasmita Kumari Nayak", "affiliation": "CUTM, Bhubaneswar" },
   { "name": "Dr. Sunil Kumar Mohapatra", "affiliation": "CUTM, Bhubaneswar" },
   { "name": "Dr. Dhawaleswar Rao Ch.", "affiliation": "CUTM, Parlakhemundi" },

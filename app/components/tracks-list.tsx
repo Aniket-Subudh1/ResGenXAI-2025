@@ -2,7 +2,7 @@
 
 import { useInView } from "react-intersection-observer"
 import { useState } from "react"
-import { User, Cpu, ImageIcon as Image, AudioWaveformIcon as Waveform } from "lucide-react"
+import { User, Cpu, ImageIcon as Image, AudioWaveformIcon as Waveform} from "lucide-react"
 
 export default function TracksList() {
   const { ref, inView } = useInView({

@@ -5,6 +5,7 @@ import AboutConference from "./components/about-conference"
 import ImportantDates from "./components/important-dates"
 import Registration from "./components/registration"
 import CallToAction from "./components/call-to-action"
+
 import Footer from "./components/footer"
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
       <ImportantDates />
       <Registration />
       <CallToAction />
+    
       <Footer />
     </main>
   )

@@ -82,19 +82,19 @@ export default function Footer() {
             <h3 className="font-bold text-lg mb-6 text-primary">Important Dates</h3>
             <ul className="space-y-3">
               <li className="text-gray-400">
-                <span className="block text-temple-gold">20th June, 2025</span>
+                <span className="block text-temple-gold">20th July, 2025</span>
                 Final Paper Submission
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">20th July, 2025</span>
+                <span className="block text-temple-gold">11th August, 2025</span>
                 Acceptance Notification
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">10th August, 2025</span>
+                <span className="block text-temple-gold">20th August, 2025</span>
                 Camera Ready Submission
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">20th August, 2025</span>
+                <span className="block text-temple-gold">25th August, 2025</span>
                 Registration Deadline
               </li>
             </ul>

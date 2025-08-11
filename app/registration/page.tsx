@@ -75,6 +75,8 @@ const PRICING = {
   }
 }
 
+const GST_RATE = 0.18 
+
 export default function RegistrationPage() {
   const [formData, setFormData] = useState<RegistrationFormData>({
     participantName: "",
@@ -95,6 +97,8 @@ export default function RegistrationPage() {
   const [loading, setLoading] = useState(false)
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
+  const [baseFee, setBaseFee] = useState(0)
+  const [gstAmount, setGstAmount] = useState(0)
   const [calculatedFee, setCalculatedFee] = useState(0)
   const [currency, setCurrency] = useState("INR")
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -130,15 +134,29 @@ export default function RegistrationPage() {
         const ieeeKey = formData.ieeeStatus === "yes" ? "ieee" : "nonIeee"
         const nationalityKey = formData.nationality === "national" ? "national" : "international"
         
+        let fee = 0
+        
         if (formData.category.toLowerCase().includes("attendee")) {
-          const fee = PRICING[categoryKey].attendee[nationalityKey]
-          setCalculatedFee(fee)
-          setCurrency(nationalityKey === "national" ? "INR" : "USD")
+          fee = PRICING[categoryKey].attendee[nationalityKey]
         } else {
-          const fee = PRICING[categoryKey][ieeeKey][nationalityKey]
-          setCalculatedFee(fee)
-          setCurrency(nationalityKey === "national" ? "INR" : "USD")
+          fee = PRICING[categoryKey][ieeeKey][nationalityKey]
         }
+        
+        setBaseFee(fee)
+        
+        // Calculate GST only for national (Indian) participants
+        if (nationalityKey === "national") {
+          const gst = fee * GST_RATE
+          setGstAmount(gst)
+          setCalculatedFee(fee + gst)
+          setCurrency("INR")
+        } else {
+          // No GST for international participants
+          setGstAmount(0)
+          setCalculatedFee(fee)
+          setCurrency("USD")
+        }
+        
       } catch (error) {
         console.error("Fee calculation error:", error)
         toast({
@@ -306,14 +324,16 @@ export default function RegistrationPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: calculatedFee,
+          amount: Math.round(calculatedFee), // Send the total amount including GST
           currency,
           receipt: `reg_${Date.now()}`,
           registrationData: {
             ...formData,
             paymentProofUrl,
             ieeeProofUrl,
-            calculatedFee,
+            baseFee,
+            gstAmount,
+            calculatedFee: Math.round(calculatedFee),
             currency
           }
         })
@@ -330,7 +350,7 @@ export default function RegistrationPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "ResGenXAI 2025",
-        description: "Conference Registration",
+        description: `Conference Registration${gstAmount > 0 ? ' (Including 18% GST)' : ''}`,
         order_id: orderData.id,
         handler: async (response: any) => {
           setPaymentLoading(true)
@@ -347,7 +367,9 @@ export default function RegistrationPage() {
                   ...formData,
                   paymentProofUrl,
                   ieeeProofUrl,
-                  calculatedFee,
+                  baseFee,
+                  gstAmount,
+                  calculatedFee: Math.round(calculatedFee),
                   currency
                 }
               })
@@ -389,6 +411,12 @@ export default function RegistrationPage() {
         },
         theme: {
           color: "#E65100"
+        },
+        notes: {
+          base_fee: baseFee.toString(),
+          gst_amount: gstAmount.toString(),
+          total_amount: Math.round(calculatedFee).toString(),
+          nationality: formData.nationality
         }
       }
 
@@ -651,10 +679,32 @@ export default function RegistrationPage() {
 
               {calculatedFee > 0 && (
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-lg">Registration Fee</h3>
-                  <p className="text-2xl font-bold text-primary">
-                    {calculatedFee} {currency}
-                  </p>
+                  <h3 className="font-semibold text-lg mb-2">Registration Fee Breakdown</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Base Fee:</span>
+                      <span className="font-medium">{baseFee} {currency}</span>
+                    </div>
+                    {gstAmount > 0 && (
+                      <div className="flex justify-between">
+                        <span>GST (18%):</span>
+                        <span className="font-medium">{Math.round(gstAmount)} {currency}</span>
+                      </div>
+                    )}
+                    <div className="border-t pt-2">
+                      <div className="flex justify-between">
+                        <span className="font-semibold">Total Amount:</span>
+                        <span className="text-2xl font-bold text-primary">
+                          {Math.round(calculatedFee)} {currency}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {gstAmount === 0 && formData.nationality === "international" && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      * No GST applicable for international participants
+                    </p>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -707,7 +757,7 @@ export default function RegistrationPage() {
                 )}
               </div>
 
-              <div className="space-y-3">
+             <div className="space-y-3">
                 <Label>Mode of Paper Presentation *</Label>
                 <RadioGroup
                   value={formData.presentationMode}
@@ -752,9 +802,46 @@ export default function RegistrationPage() {
                 <p><strong>Nationality:</strong> {formData.nationality}</p>
                 <p><strong>Paper ID:</strong> {formData.paperId}</p>
                 <p><strong>Presentation Mode:</strong> {formData.presentationMode}</p>
-                <p className="text-lg font-bold text-primary">
-                  <strong>Total Fee: {calculatedFee} {currency}</strong>
-                </p>
+              </div>
+
+              {/* Enhanced Fee Breakdown */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="font-semibold text-lg mb-3">Payment Breakdown</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Registration Fee:</span>
+                    <span className="font-medium">{baseFee} {currency}</span>
+                  </div>
+                  {gstAmount > 0 && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span>GST (18%):</span>
+                        <span className="font-medium">+{Math.round(gstAmount)} {currency}</span>
+                      </div>
+                      <div className="border-t border-blue-200 pt-2">
+                        <div className="flex justify-between">
+                          <span className="font-semibold">Total Amount (Incl. GST):</span>
+                          <span className="text-xl font-bold text-primary">
+                            {Math.round(calculatedFee)} {currency}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {gstAmount === 0 && (
+                    <div className="border-t border-blue-200 pt-2">
+                      <div className="flex justify-between">
+                        <span className="font-semibold">Total Amount:</span>
+                        <span className="text-xl font-bold text-primary">
+                          {Math.round(calculatedFee)} {currency}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        * No GST applicable for international participants
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {!razorpayLoaded && (
@@ -864,7 +951,7 @@ export default function RegistrationPage() {
                   ) : !razorpayLoaded ? (
                     "Loading Payment..."
                   ) : (
-                    `Pay ${calculatedFee} ${currency}`
+                    `Pay ${Math.round(calculatedFee)} ${currency}${gstAmount > 0 ? ' (Incl. GST)' : ''}`
                   )}
                 </Button>
               )}
@@ -877,6 +964,11 @@ export default function RegistrationPage() {
                 <AlertDescription>
                   <strong>Important:</strong> Please ensure all information is correct before proceeding to payment. 
                   Registration details cannot be modified after successful payment.
+                  {gstAmount > 0 && (
+                    <span className="block mt-1">
+                      * GST of 18% is applicable for Indian participants as per government regulations.
+                    </span>
+                  )}
                 </AlertDescription>
               </Alert>
             </div>

@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ 
       error: 'Failed to fetch dashboard data',
-      details: isDevelopment ? error.message : undefined,
+      details: isDevelopment ? (error instanceof Error ? error.message : 'Unknown error') : undefined,
       timestamp: new Date().toISOString()
     }, { status: 500 })
   }

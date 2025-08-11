@@ -156,7 +156,7 @@ export default function Hero() {
               <span className="text-white font-medium tracking-wider text-sm">IEEE Conference Record #64788</span>
             </div>
             <div className="inline-block bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-              <span className="text-white font-medium tracking-wider text-sm">Hybrid Mode</span>
+              <span className="text-white font-medium tracking-wider text-sm">HYBRID MODE</span>
             </div>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
               <span className="block">2025 International Conference on</span>
