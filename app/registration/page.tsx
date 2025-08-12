@@ -54,7 +54,7 @@ const COUNTRIES = [
   "New Zealand", "Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland", "Portugal",
   "Qatar", "Romania", "Russia", "Saudi Arabia", "Singapore", "Slovakia", "Slovenia", "South Africa",
   "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland", "Thailand", "Turkey", "Ukraine",
-  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Venezuela", "Vietnam"
+  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Venezuela", "Vietnam","0"
 ]
 
 const PRICING = {
