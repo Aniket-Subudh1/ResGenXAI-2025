@@ -10,8 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, FileText, Users, CreditCard, CheckCircle, Loader2, AlertCircle } from "lucide-react"
+import { Upload, FileText, Users, CreditCard, CheckCircle, Loader2, AlertCircle, XCircle, UserCheck } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 declare global {
   interface Window {
@@ -43,6 +44,14 @@ interface RegistrationFormData {
   ieeeProof?: File
 }
 
+interface DuplicateCheckResult {
+  isDuplicate: boolean
+  message: string
+  registrationId?: string
+  paymentStatus?: string
+  field?: string
+}
+
 const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
   "Bahrain", "Bangladesh", "Belarus", "Belgium", "Bolivia", "Bosnia and Herzegovina", "Brazil", "Bulgaria",
@@ -54,7 +63,7 @@ const COUNTRIES = [
   "New Zealand", "Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland", "Portugal",
   "Qatar", "Romania", "Russia", "Saudi Arabia", "Singapore", "Slovakia", "Slovenia", "South Africa",
   "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland", "Thailand", "Turkey", "Ukraine",
-  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Venezuela", "Vietnam","0"
+  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Venezuela", "Vietnam"
 ]
 
 const PRICING = {
@@ -97,12 +106,15 @@ export default function RegistrationPage() {
   const [loading, setLoading] = useState(false)
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
+  const [duplicateChecking, setDuplicateChecking] = useState(false)
   const [baseFee, setBaseFee] = useState(0)
   const [gstAmount, setGstAmount] = useState(0)
   const [calculatedFee, setCalculatedFee] = useState(0)
   const [currency, setCurrency] = useState("INR")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [razorpayLoaded, setRazorpayLoaded] = useState(false)
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false)
+  const [duplicateInfo, setDuplicateInfo] = useState<DuplicateCheckResult | null>(null)
   
   const router = useRouter()
   const { toast } = useToast()
@@ -168,6 +180,30 @@ export default function RegistrationPage() {
     }
   }, [formData.category, formData.ieeeStatus, formData.nationality])
 
+  const checkForDuplicates = async (email: string, paperId?: string) => {
+    if (!email) return { isDuplicate: false, message: '' }
+
+    setDuplicateChecking(true)
+    try {
+      const response = await fetch('/api/check-duplicate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: email.toLowerCase().trim(),
+          paperId: paperId?.trim() 
+        })
+      })
+
+      const result = await response.json()
+      return result
+    } catch (error) {
+      console.error('Duplicate check error:', error)
+      return { isDuplicate: false, message: 'Failed to check duplicates' }
+    } finally {
+      setDuplicateChecking(false)
+    }
+  }
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -182,6 +218,25 @@ export default function RegistrationPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const handleEmailBlur = async () => {
+    if (formData.email && validateEmail(formData.email)) {
+      const duplicateResult = await checkForDuplicates(formData.email)
+      if (duplicateResult.isDuplicate) {
+        setDuplicateInfo(duplicateResult)
+        setDuplicateDialogOpen(true)
+      }
+    }
+  }
+
+  const handlePaperIdBlur = async () => {
+    if (formData.paperId && formData.email && validateEmail(formData.email)) {
+      const duplicateResult = await checkForDuplicates(formData.email, formData.paperId)
+      if (duplicateResult.isDuplicate && duplicateResult.field === 'paperId') {
+        setErrors(prev => ({ ...prev, paperId: duplicateResult.message }))
+      }
     }
   }
 
@@ -267,16 +322,27 @@ export default function RegistrationPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleNextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => prev + 1)
-    } else {
+  const handleNextStep = async () => {
+    if (!validateStep(currentStep)) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields correctly",
         variant: "destructive"
       })
+      return
     }
+
+    // Check for duplicates before proceeding to payment
+    if (currentStep === 3) {
+      const duplicateResult = await checkForDuplicates(formData.email, formData.paperId)
+      if (duplicateResult.isDuplicate) {
+        setDuplicateInfo(duplicateResult)
+        setDuplicateDialogOpen(true)
+        return
+      }
+    }
+
+    setCurrentStep(prev => prev + 1)
   }
 
   const handlePayment = async () => {
@@ -295,6 +361,14 @@ export default function RegistrationPage() {
         description: "Please complete all required fields",
         variant: "destructive"
       })
+      return
+    }
+
+    // Final duplicate check before payment
+    const duplicateResult = await checkForDuplicates(formData.email, formData.paperId)
+    if (duplicateResult.isDuplicate) {
+      setDuplicateInfo(duplicateResult)
+      setDuplicateDialogOpen(true)
       return
     }
 
@@ -324,7 +398,7 @@ export default function RegistrationPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: Math.round(calculatedFee), // Send the total amount including GST
+          amount: Math.round(calculatedFee),
           currency,
           receipt: `reg_${Date.now()}`,
           registrationData: {
@@ -380,21 +454,40 @@ export default function RegistrationPage() {
             if (verifyResponse.ok) {
               toast({
                 title: "Success!",
-                description: "Registration completed successfully. Redirecting..."
+                description: verifyData.isDuplicate 
+                  ? "Payment confirmed! Registration was already completed." 
+                  : "Registration completed successfully. Redirecting..."
               })
               
               setTimeout(() => {
                 router.push(`/registration/success?registrationId=${verifyData.registrationId}`)
               }, 1500)
             } else {
-              throw new Error(verifyData.error || 'Payment verification failed')
+              // Handle specific error codes
+              if (verifyData.code === 'EMAIL_ALREADY_REGISTERED') {
+                toast({
+                  title: "Registration Already Exists",
+                  description: `This email is already registered with ID: ${verifyData.existingRegistrationId}. Your payment will be refunded.`,
+                  variant: "destructive"
+                })
+              } else if (verifyData.code === 'PAPER_ID_DUPLICATE') {
+                toast({
+                  title: "Paper ID Already Used",
+                  description: "This Paper ID is already registered. Your payment will be refunded.",
+                  variant: "destructive"
+                })
+              } else {
+                throw new Error(verifyData.error || 'Payment verification failed')
+              }
+              
+              setPaymentLoading(false)
             }
           } catch (error) {
             console.error('Payment verification error:', error)
             setPaymentLoading(false)
             toast({
               title: "Error",
-              description: "Payment verification failed. Please contact support with your payment ID.",
+              description: "Payment verification failed. Please contact support with your payment ID: " + response.razorpay_payment_id,
               variant: "destructive"
             })
           }
@@ -459,6 +552,51 @@ export default function RegistrationPage() {
     </div>
   )
 
+  // Duplicate Registration Dialog
+  const DuplicateDialog = () => (
+    <Dialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-yellow-500" />
+            Registration Already Exists
+          </DialogTitle>
+          <DialogDescription>
+            {duplicateInfo?.message}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          {duplicateInfo?.registrationId && (
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm font-medium text-blue-900">
+                Existing Registration ID: {duplicateInfo.registrationId}
+              </p>
+              <p className="text-sm text-blue-700">
+                Payment Status: {duplicateInfo.paymentStatus === 'completed' ? 'Completed' : 'Pending'}
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <Button 
+              onClick={() => setDuplicateDialogOpen(false)}
+              variant="outline"
+            >
+              Edit Registration Details
+            </Button>
+            {duplicateInfo?.registrationId && (
+              <Button 
+                onClick={() => router.push(`/registration/success?registrationId=${duplicateInfo.registrationId}`)}
+                className="w-full"
+              >
+                View Existing Registration
+              </Button>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -488,14 +626,22 @@ export default function RegistrationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="your.email@example.com"
-                  className={errors.email ? "border-red-500" : ""}
-                />
+                <div className="relative">
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    onBlur={handleEmailBlur}
+                    placeholder="your.email@example.com"
+                    className={errors.email ? "border-red-500" : ""}
+                  />
+                  {duplicateChecking && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  )}
+                </div>
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email}</p>
                 )}
@@ -728,6 +874,7 @@ export default function RegistrationPage() {
                   id="paperId"
                   value={formData.paperId}
                   onChange={(e) => handleInputChange("paperId", e.target.value)}
+                  onBlur={handlePaperIdBlur}
                   placeholder="e.g., PID001"
                   className={errors.paperId ? "border-red-500" : ""}
                 />
@@ -861,6 +1008,15 @@ export default function RegistrationPage() {
                   </AlertDescription>
                 </Alert>
               )}
+
+              {duplicateChecking && (
+                <Alert>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <AlertDescription>
+                    Checking for duplicate registrations... Please wait.
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         )
@@ -875,6 +1031,7 @@ export default function RegistrationPage() {
       <Header />
       
       {paymentLoading && <LoadingOverlay />}
+      <DuplicateDialog />
       
       <section className="pb-20 pt-10 relative overflow-hidden">
         <div className="container mx-auto px-4">
@@ -918,7 +1075,7 @@ export default function RegistrationPage() {
               <Button
                 variant="outline"
                 onClick={() => setCurrentStep(prev => prev - 1)}
-                disabled={currentStep === 1 || loading || paymentLoading}
+                disabled={currentStep === 1 || loading || paymentLoading || duplicateChecking}
               >
                 Previous
               </Button>
@@ -926,9 +1083,14 @@ export default function RegistrationPage() {
               {currentStep < 4 ? (
                 <Button 
                   onClick={handleNextStep}
-                  disabled={loading || paymentLoading}
+                  disabled={loading || paymentLoading || duplicateChecking}
                 >
-                  {loading ? (
+                  {duplicateChecking ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Checking...
+                    </>
+                  ) : loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                       Loading...
@@ -940,13 +1102,18 @@ export default function RegistrationPage() {
               ) : (
                 <Button 
                   onClick={handlePayment} 
-                  disabled={loading || paymentLoading || !razorpayLoaded}
+                  disabled={loading || paymentLoading || !razorpayLoaded || duplicateChecking}
                   className="min-w-[200px]"
                 >
                   {paymentLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                       Processing...
+                    </>
+                  ) : duplicateChecking ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Checking...
                     </>
                   ) : !razorpayLoaded ? (
                     "Loading Payment..."
@@ -963,7 +1130,7 @@ export default function RegistrationPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   <strong>Important:</strong> Please ensure all information is correct before proceeding to payment. 
-                  Registration details cannot be modified after successful payment.
+                  We check for duplicate registrations to prevent multiple payments.
                   {gstAmount > 0 && (
                     <span className="block mt-1">
                       * GST of 18% is applicable for Indian participants as per government regulations.
