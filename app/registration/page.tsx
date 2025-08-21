@@ -70,7 +70,7 @@ const PRICING = {
   student: {
     ieee: { national: 6500, international: 250 },
     nonIeee: { national: 7500, international: 300 },
-    attendee: { national: 1, international: 100 }
+    attendee: { national: 1000, international: 100 }
   },
   academician: {
     ieee: { national: 7500, international: 350 },
