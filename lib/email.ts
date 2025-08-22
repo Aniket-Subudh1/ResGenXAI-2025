@@ -14,7 +14,7 @@ export const sendConfirmationEmail = async (registrationData: any) => {
   const hasGST = registrationData.gstAmount && registrationData.gstAmount > 0
   
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"ResGenXAI 2025" <${process.env.SMTP_FROM}>`,
     to: registrationData.email,
     subject: 'ResGenXAI 2025 - Registration Confirmation',
     html: `
