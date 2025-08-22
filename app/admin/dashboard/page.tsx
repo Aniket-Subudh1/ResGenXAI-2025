@@ -106,6 +106,25 @@ interface RefundDialogProps {
   onRefundComplete: () => void
 }
 
+// USD to INR conversion rate (you should ideally fetch this from an API)
+const USD_TO_INR_RATE = 83.5 // Update this rate as needed
+
+// Currency conversion utility functions
+const convertToINR = (amount: number, currency: string): number => {
+  if (currency === 'USD') {
+    return amount * USD_TO_INR_RATE
+  }
+  return amount
+}
+
+const formatCurrencyDisplay = (amount: number, currency: string): string => {
+  const inrAmount = convertToINR(amount, currency)
+  if (currency === 'USD') {
+    return `₹${Math.round(inrAmount).toLocaleString()} (${amount} USD)`
+  }
+  return `₹${Math.round(inrAmount).toLocaleString()}`
+}
+
 const RefundDialog = ({ registration, isOpen, onOpenChange, onRefundComplete }: RefundDialogProps) => {
   const [loading, setLoading] = useState(false)
   const [reason, setReason] = useState("")
@@ -138,9 +157,10 @@ const RefundDialog = ({ registration, isOpen, onOpenChange, onRefundComplete }: 
       const data = await response.json()
 
       if (response.ok) {
+        const displayAmount = formatCurrencyDisplay(data.amount, registration.currency)
         toast({
           title: "Success",
-          description: `Refund of ${data.amount} ${registration.currency} processed successfully`
+          description: `Refund of ${displayAmount} processed successfully`
         })
         onRefundComplete()
         onOpenChange(false)
@@ -179,7 +199,7 @@ const RefundDialog = ({ registration, isOpen, onOpenChange, onRefundComplete }: 
             <div className="p-3 bg-gray-50 rounded-lg">
               <p className="text-sm"><strong>Registration ID:</strong> {registration.registrationId}</p>
               <p className="text-sm"><strong>Participant:</strong> {registration.participantName}</p>
-              <p className="text-sm"><strong>Amount:</strong> {registration.calculatedFee} {registration.currency}</p>
+              <p className="text-sm"><strong>Amount:</strong> {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}</p>
               <p className="text-sm"><strong>Payment ID:</strong> {registration.paymentId}</p>
             </div>
 
@@ -231,7 +251,7 @@ const RefundDialog = ({ registration, isOpen, onOpenChange, onRefundComplete }: 
                     Processing...
                   </>
                 ) : (
-                  `Refund ${registration.calculatedFee} ${registration.currency}`
+                  `Refund ${formatCurrencyDisplay(registration.calculatedFee, registration.currency)}`
                 )}
               </Button>
             </div>
@@ -373,17 +393,17 @@ const DetailView = ({ registration, isOpen, onOpenChange, onRefund }: DetailView
                   <div className="mt-2 space-y-1">
                     <div className="flex justify-between text-sm">
                       <span>Base Fee:</span>
-                      <span>{registration.baseFee || registration.calculatedFee} {registration.currency}</span>
+                      <span>{formatCurrencyDisplay(registration.baseFee || registration.calculatedFee, registration.currency)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>GST (18%):</span>
-                      <span>+{Math.round(registration.gstAmount)} {registration.currency}</span>
+                      <span>+{formatCurrencyDisplay(Math.round(registration.gstAmount), registration.currency)}</span>
                     </div>
                     <div className="border-t pt-1">
                       <div className="flex justify-between font-semibold">
                         <span>Total Amount:</span>
                         <span className="text-lg text-primary">
-                          {registration.calculatedFee} {registration.currency}
+                          {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}
                         </span>
                       </div>
                     </div>
@@ -393,7 +413,7 @@ const DetailView = ({ registration, isOpen, onOpenChange, onRefund }: DetailView
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Registration Fee</Label>
                   <p className="text-2xl font-bold text-primary">
-                    {registration.calculatedFee} {registration.currency}
+                    {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">No GST applicable (International)</p>
                 </div>
@@ -446,7 +466,7 @@ const DetailView = ({ registration, isOpen, onOpenChange, onRefund }: DetailView
                     </div>
                     <div className="flex justify-between">
                       <span>Refund Amount:</span>
-                      <span>{registration.refundAmount} {registration.currency}</span>
+                      <span>{formatCurrencyDisplay(registration.refundAmount || 0, registration.currency)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Refund Date:</span>
@@ -551,7 +571,7 @@ const DetailView = ({ registration, isOpen, onOpenChange, onRefund }: DetailView
                 <div className="bg-green-50 p-2 rounded border">
                   <Label className="text-sm font-medium text-green-800">GST Information</Label>
                   <p className="text-xs text-green-700 mt-1">
-                    GST of {Math.round(registration.gstAmount)} {registration.currency} has been applied as per Indian tax regulations.
+                    GST of {formatCurrencyDisplay(Math.round(registration.gstAmount), registration.currency)} has been applied as per Indian tax regulations.
                     This registration serves as a GST invoice.
                   </p>
                 </div>
@@ -655,6 +675,14 @@ export default function AdminDashboard() {
   }
 
   const enrichDashboardData = (data: any): DashboardData => {
+    // Convert all amounts to INR for calculation
+    const totalAmountInINR = data.allRegistrations
+      .filter((reg: Registration) => reg.paymentStatus === 'completed')
+      .reduce((sum: number, reg: Registration) => {
+        const inrAmount = convertToINR(reg.calculatedFee, reg.currency)
+        return sum + inrAmount
+      }, 0)
+
     // Add additional breakdowns
     const nationalityBreakdown = data.allRegistrations.reduce((acc: Record<string, number>, reg: Registration) => {
       acc[reg.nationality] = (acc[reg.nationality] || 0) + 1
@@ -714,13 +742,17 @@ export default function AdminDashboard() {
       .filter(([_, registrations]) => (registrations as Registration[]).length > 1)
       .map(([paperId, registrations]) => ({ paperId, count: (registrations as Registration[]).length, registrations: registrations as Registration[] }))
 
-    // Calculate refund statistics
+    // Calculate refund statistics (convert to INR)
     const refundedRegistrations = data.allRegistrations.filter((reg: Registration) => reg.paymentStatus === 'refunded')
     const refundedPayments = refundedRegistrations.length
-    const totalRefundAmount = refundedRegistrations.reduce((sum: number, reg: Registration) => sum + (reg.refundAmount || 0), 0)
+    const totalRefundAmountInINR = refundedRegistrations.reduce((sum: number, reg: Registration) => {
+      const inrAmount = convertToINR(reg.refundAmount || 0, reg.currency)
+      return sum + inrAmount
+    }, 0)
 
     return {
       ...data,
+      totalAmount: Math.round(totalAmountInINR), // Override with INR converted amount
       nationalityBreakdown,
       paymentStatusBreakdown,
       presentationModeBreakdown,
@@ -729,7 +761,7 @@ export default function AdminDashboard() {
       duplicateEmails,
       duplicatePaperIds,
       refundedPayments,
-      totalRefundAmount
+      totalRefundAmount: Math.round(totalRefundAmountInINR) // Override with INR converted amount
     }
   }
 
@@ -875,6 +907,9 @@ export default function AdminDashboard() {
               <p className="text-gray-600">Conference Registration Dashboard</p>
               <p className="text-sm text-gray-500 mt-1">
                 Last updated: {new Date().toLocaleString()}
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                * All amounts displayed in INR (USD amounts converted at rate: 1 USD = ₹{USD_TO_INR_RATE})
               </p>
             </div>
             <div className="flex gap-2">
@@ -1104,7 +1139,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium">{reg.calculatedFee} {reg.currency}</p>
+                          <p className="text-sm font-medium">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
                           <p className="text-xs text-gray-500">
                             {new Date(reg.registrationDate).toLocaleDateString()}
                           </p>
@@ -1222,7 +1257,7 @@ export default function AdminDashboard() {
                         <TableHead>Country</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>IEEE</TableHead>
-                        <TableHead>Amount</TableHead>
+                        <TableHead>Amount (INR)</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Actions</TableHead>
@@ -1246,7 +1281,7 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {reg.calculatedFee} {reg.currency}
+                            {formatCurrencyDisplay(reg.calculatedFee, reg.currency)}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
@@ -1333,7 +1368,7 @@ export default function AdminDashboard() {
                                   } className="text-xs">
                                     {reg.paymentStatus}
                                   </Badge>
-                                  <p className="text-gray-500 mt-1">{reg.calculatedFee} {reg.currency}</p>
+                                  <p className="text-gray-500 mt-1">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
                                 </div>
                                 <Button
                                   size="sm"
@@ -1387,7 +1422,7 @@ export default function AdminDashboard() {
                                   } className="text-xs">
                                     {reg.paymentStatus}
                                   </Badge>
-                                  <p className="text-gray-500 mt-1">{reg.calculatedFee} {reg.currency}</p>
+                                  <p className="text-gray-500 mt-1">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
                                 </div>
                                 <Button
                                   size="sm"
@@ -1416,7 +1451,7 @@ export default function AdminDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4" />
-                    Revenue by Category
+                    Revenue by Category (INR)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1424,7 +1459,10 @@ export default function AdminDashboard() {
                     {Object.entries(dashboardData.categoryBreakdown).map(([category, count]) => {
                       const categoryRevenue = dashboardData.allRegistrations
                         .filter(reg => reg.category === category && reg.paymentStatus === 'completed')
-                        .reduce((sum, reg) => sum + reg.calculatedFee, 0)
+                        .reduce((sum, reg) => {
+                          const inrAmount = convertToINR(reg.calculatedFee, reg.currency)
+                          return sum + inrAmount
+                        }, 0)
                       
                       const percentage = ((categoryRevenue / dashboardData.totalAmount) * 100).toFixed(1)
                       
@@ -1432,7 +1470,7 @@ export default function AdminDashboard() {
                         <div key={category} className="space-y-2">
                           <div className="flex justify-between items-center">
                             <span className="capitalize text-sm">{category.replace('-', ' ')}</span>
-                            <span className="font-medium">₹{categoryRevenue.toLocaleString()}</span>
+                            <span className="font-medium">₹{Math.round(categoryRevenue).toLocaleString()}</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
@@ -1564,7 +1602,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">₹{dashboardData.totalRefundAmount.toLocaleString()}</div>
-                  <p className="text-sm text-gray-600">Total refunded</p>
+                  <p className="text-sm text-gray-600">Total refunded (INR)</p>
                 </CardContent>
               </Card>
 
@@ -1597,7 +1635,7 @@ export default function AdminDashboard() {
                         <TableHead>Participant</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Original Amount</TableHead>
-                        <TableHead>Refund Amount</TableHead>
+                        <TableHead>Refund Amount (INR)</TableHead>
                         <TableHead>Refund Date</TableHead>
                         <TableHead>Reason</TableHead>
                         <TableHead>Actions</TableHead>
@@ -1611,9 +1649,9 @@ export default function AdminDashboard() {
                             <TableCell className="font-mono text-sm">{reg.registrationId}</TableCell>
                             <TableCell className="font-medium">{reg.participantName}</TableCell>
                             <TableCell>{reg.email}</TableCell>
-                            <TableCell>{reg.calculatedFee} {reg.currency}</TableCell>
+                            <TableCell>{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</TableCell>
                             <TableCell className="font-medium text-orange-600">
-                              {reg.refundAmount || reg.calculatedFee} {reg.currency}
+                              {formatCurrencyDisplay(reg.refundAmount || reg.calculatedFee, reg.currency)}
                             </TableCell>
                             <TableCell>
                               {reg.refundDate ? new Date(reg.refundDate).toLocaleDateString() : 'N/A'}
