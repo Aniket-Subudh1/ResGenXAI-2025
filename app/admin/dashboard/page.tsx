@@ -107,7 +107,7 @@ interface RefundDialogProps {
 }
 
 // USD to INR conversion rate (you should ideally fetch this from an API)
-const USD_TO_INR_RATE = 83.5 // Update this rate as needed
+const USD_TO_INR_RATE = 87.5 // Update this rate as needed
 
 // Currency conversion utility functions
 const convertToINR = (amount: number, currency: string): number => {
