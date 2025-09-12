@@ -2,15 +2,14 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Header from "../components/header"
+import { CheckCircle, Heart } from 'lucide-react';
 import Footer from "../components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, FileText, Users, CreditCard, CheckCircle, Loader2, AlertCircle } from "lucide-react"
+import { Upload, FileText, Users, CreditCard, Loader2, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 declare global {
@@ -459,523 +458,459 @@ export default function RegistrationPage() {
     </div>
   )
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Personal Information
-              </CardTitle>
-              <CardDescription>Please provide your basic details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="participantName">Name of the Participant *</Label>
-                <Input
-                  id="participantName"
-                  value={formData.participantName}
-                  onChange={(e) => handleInputChange("participantName", e.target.value)}
-                  placeholder="Your full name"
-                  className={errors.participantName ? "border-red-500" : ""}
-                />
-                {errors.participantName && (
-                  <p className="text-sm text-red-500">{errors.participantName}</p>
-                )}
-              </div>
+  // const renderStep = () => {
+  //   switch (currentStep) {
+  //     case 1:
+  //       return (
+  //         <Card className="w-full max-w-2xl mx-auto">
+  //           <CardHeader>
+  //             <CardTitle className="flex items-center gap-2">
+  //               <Users className="h-5 w-5" />
+  //               Personal Information
+  //             </CardTitle>
+  //             <CardDescription>Please provide your basic details</CardDescription>
+  //           </CardHeader>
+  //           <CardContent className="space-y-4">
+  //             <div className="space-y-2">
+  //               <Label htmlFor="participantName">Name of the Participant *</Label>
+  //               <Input
+  //                 id="participantName"
+  //                 value={formData.participantName}
+  //                 onChange={(e) => handleInputChange("participantName", e.target.value)}
+  //                 placeholder="Your full name"
+  //                 className={errors.participantName ? "border-red-500" : ""}
+  //               />
+  //               {errors.participantName && (
+  //                 <p className="text-sm text-red-500">{errors.participantName}</p>
+  //               )}
+  //             </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="your.email@example.com"
-                  className={errors.email ? "border-red-500" : ""}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email}</p>
-                )}
-              </div>
+  //             <div className="space-y-2">
+  //               <Label htmlFor="email">Email Address *</Label>
+  //               <Input
+  //                 id="email"
+  //                 type="email"
+  //                 value={formData.email}
+  //                 onChange={(e) => handleInputChange("email", e.target.value)}
+  //                 placeholder="your.email@example.com"
+  //                 className={errors.email ? "border-red-500" : ""}
+  //               />
+  //               {errors.email && (
+  //                 <p className="text-sm text-red-500">{errors.email}</p>
+  //               )}
+  //             </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="mobileNumber">Mobile Number *</Label>
-                  <Input
-                    id="mobileNumber"
-                    value={formData.mobileNumber}
-                    onChange={(e) => handleInputChange("mobileNumber", e.target.value)}
-                    placeholder="+91 1234567890"
-                    className={errors.mobileNumber ? "border-red-500" : ""}
-                  />
-                  {errors.mobileNumber && (
-                    <p className="text-sm text-red-500">{errors.mobileNumber}</p>
-                  )}
-                </div>
+  //             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  //               <div className="space-y-2">
+  //                 <Label htmlFor="mobileNumber">Mobile Number *</Label>
+  //                 <Input
+  //                   id="mobileNumber"
+  //                   value={formData.mobileNumber}
+  //                   onChange={(e) => handleInputChange("mobileNumber", e.target.value)}
+  //                   placeholder="+91 1234567890"
+  //                   className={errors.mobileNumber ? "border-red-500" : ""}
+  //                 />
+  //                 {errors.mobileNumber && (
+  //                   <p className="text-sm text-red-500">{errors.mobileNumber}</p>
+  //                 )}
+  //               </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
-                  <Input
-                    id="whatsappNumber"
-                    value={formData.whatsappNumber}
-                    onChange={(e) => handleInputChange("whatsappNumber", e.target.value)}
-                    placeholder="+91 1234567890"
-                    className={errors.whatsappNumber ? "border-red-500" : ""}
-                  />
-                  {errors.whatsappNumber && (
-                    <p className="text-sm text-red-500">{errors.whatsappNumber}</p>
-                  )}
-                </div>
-              </div>
+  //               <div className="space-y-2">
+  //                 <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
+  //                 <Input
+  //                   id="whatsappNumber"
+  //                   value={formData.whatsappNumber}
+  //                   onChange={(e) => handleInputChange("whatsappNumber", e.target.value)}
+  //                   placeholder="+91 1234567890"
+  //                   className={errors.whatsappNumber ? "border-red-500" : ""}
+  //                 />
+  //                 {errors.whatsappNumber && (
+  //                   <p className="text-sm text-red-500">{errors.whatsappNumber}</p>
+  //                 )}
+  //               </div>
+  //             </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="country">Your Country *</Label>
-                <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
-                  <SelectTrigger className={errors.country ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Select your country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRIES.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.country && (
-                  <p className="text-sm text-red-500">{errors.country}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )
+  //             <div className="space-y-2">
+  //               <Label htmlFor="country">Your Country *</Label>
+  //               <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
+  //                 <SelectTrigger className={errors.country ? "border-red-500" : ""}>
+  //                   <SelectValue placeholder="Select your country" />
+  //                 </SelectTrigger>
+  //                 <SelectContent>
+  //                   {COUNTRIES.map((country) => (
+  //                     <SelectItem key={country} value={country}>
+  //                       {country}
+  //                     </SelectItem>
+  //                   ))}
+  //                 </SelectContent>
+  //               </Select>
+  //               {errors.country && (
+  //                 <p className="text-sm text-red-500">{errors.country}</p>
+  //               )}
+  //             </div>
+  //           </CardContent>
+  //         </Card>
+  //       )
 
-      case 2:
-        return (
-          <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Registration Category
-              </CardTitle>
-              <CardDescription>Select your category and membership status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Category *</Label>
-                <RadioGroup
-                  value={formData.category}
-                  onValueChange={(value) => handleInputChange("category", value)}
-                  className={errors.category ? "border border-red-500 p-3 rounded" : ""}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="student" id="student" />
-                    <Label htmlFor="student">Student / Research Scholar</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="academician" id="academician" />
-                    <Label htmlFor="academician">Academician</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="industry" id="industry" />
-                    <Label htmlFor="industry">Industry</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="attendee-student" id="attendee-student" />
-                    <Label htmlFor="attendee-student">Attendee - Student</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="attendee-academician" id="attendee-academician" />
-                    <Label htmlFor="attendee-academician">Attendee - Academician</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="attendee-industry" id="attendee-industry" />
-                    <Label htmlFor="attendee-industry">Attendee - Industry</Label>
-                  </div>
-                </RadioGroup>
-                {errors.category && (
-                  <p className="text-sm text-red-500">{errors.category}</p>
-                )}
-              </div>
+  //     case 2:
+  //       return (
+  //         <Card className="w-full max-w-2xl mx-auto">
+  //           <CardHeader>
+  //             <CardTitle className="flex items-center gap-2">
+  //               <CreditCard className="h-5 w-5" />
+  //               Registration Category
+  //             </CardTitle>
+  //             <CardDescription>Select your category and membership status</CardDescription>
+  //           </CardHeader>
+  //           <CardContent className="space-y-6">
+  //             <div className="space-y-3">
+  //               <Label>Category *</Label>
+  //               <RadioGroup
+  //                 value={formData.category}
+  //                 onValueChange={(value) => handleInputChange("category", value)}
+  //                 className={errors.category ? "border border-red-500 p-3 rounded" : ""}
+  //               >
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="student" id="student" />
+  //                   <Label htmlFor="student">Student / Research Scholar</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="academician" id="academician" />
+  //                   <Label htmlFor="academician">Academician</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="industry" id="industry" />
+  //                   <Label htmlFor="industry">Industry</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="attendee-student" id="attendee-student" />
+  //                   <Label htmlFor="attendee-student">Attendee - Student</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="attendee-academician" id="attendee-academician" />
+  //                   <Label htmlFor="attendee-academician">Attendee - Academician</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="attendee-industry" id="attendee-industry" />
+  //                   <Label htmlFor="attendee-industry">Attendee - Industry</Label>
+  //                 </div>
+  //               </RadioGroup>
+  //               {errors.category && (
+  //                 <p className="text-sm text-red-500">{errors.category}</p>
+  //               )}
+  //             </div>
 
-              <div className="space-y-3">
-                <Label>Are you an IEEE Member? *</Label>
-                <RadioGroup
-                  value={formData.ieeeStatus}
-                  onValueChange={(value) => handleInputChange("ieeeStatus", value)}
-                  className={errors.ieeeStatus ? "border border-red-500 p-3 rounded" : ""}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="ieee-yes" />
-                    <Label htmlFor="ieee-yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="ieee-no" />
-                    <Label htmlFor="no">No</Label>
-                  </div>
-                </RadioGroup>
-                {errors.ieeeStatus && (
-                  <p className="text-sm text-red-500">{errors.ieeeStatus}</p>
-                )}
-              </div>
+  //             <div className="space-y-3">
+  //               <Label>Are you an IEEE Member? *</Label>
+  //               <RadioGroup
+  //                 value={formData.ieeeStatus}
+  //                 onValueChange={(value) => handleInputChange("ieeeStatus", value)}
+  //                 className={errors.ieeeStatus ? "border border-red-500 p-3 rounded" : ""}
+  //               >
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="yes" id="ieee-yes" />
+  //                   <Label htmlFor="ieee-yes">Yes</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="no" id="ieee-no" />
+  //                   <Label htmlFor="no">No</Label>
+  //                 </div>
+  //               </RadioGroup>
+  //               {errors.ieeeStatus && (
+  //                 <p className="text-sm text-red-500">{errors.ieeeStatus}</p>
+  //               )}
+  //             </div>
 
-              {formData.ieeeStatus === "yes" && (
-                <div className="space-y-2">
-                  <Label htmlFor="ieeeProof">IEEE Membership Proof *</Label>
-                  <div className={`border-2 border-dashed rounded-lg p-4 ${errors.ieeeProof ? "border-red-500" : "border-gray-300"}`}>
-                    <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="mt-4">
-                        <label htmlFor="ieeeProof" className="cursor-pointer">
-                          <span className="mt-2 block text-sm font-medium text-gray-900">
-                            Upload IEEE Membership Certificate
-                          </span>
-                          <span className="text-xs text-gray-500">PDF, JPG, PNG (Max 5MB)</span>
-                          <input
-                            id="ieeeProof"
-                            type="file"
-                            className="sr-only"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => e.target.files?.[0] && handleFileChange("ieeeProof", e.target.files[0])}
-                          />
-                        </label>
-                        {formData.ieeeProof && (
-                          <p className="text-sm text-green-600 mt-2">
-                            ✓ {formData.ieeeProof.name}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {errors.ieeeProof && (
-                    <p className="text-sm text-red-500">{errors.ieeeProof}</p>
-                  )}
-                </div>
-              )}
+  //             {formData.ieeeStatus === "yes" && (
+  //               <div className="space-y-2">
+  //                 <Label htmlFor="ieeeProof">IEEE Membership Proof *</Label>
+  //                 <div className={`border-2 border-dashed rounded-lg p-4 ${errors.ieeeProof ? "border-red-500" : "border-gray-300"}`}>
+  //                   <div className="text-center">
+  //                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
+  //                     <div className="mt-4">
+  //                       <label htmlFor="ieeeProof" className="cursor-pointer">
+  //                         <span className="mt-2 block text-sm font-medium text-gray-900">
+  //                           Upload IEEE Membership Certificate
+  //                         </span>
+  //                         <span className="text-xs text-gray-500">PDF, JPG, PNG (Max 5MB)</span>
+  //                         <input
+  //                           id="ieeeProof"
+  //                           type="file"
+  //                           className="sr-only"
+  //                           accept=".pdf,.jpg,.jpeg,.png"
+  //                           onChange={(e) => e.target.files?.[0] && handleFileChange("ieeeProof", e.target.files[0])}
+  //                         />
+  //                       </label>
+  //                       {formData.ieeeProof && (
+  //                         <p className="text-sm text-green-600 mt-2">
+  //                           ✓ {formData.ieeeProof.name}
+  //                         </p>
+  //                       )}
+  //                     </div>
+  //                   </div>
+  //                 </div>
+  //                 {errors.ieeeProof && (
+  //                   <p className="text-sm text-red-500">{errors.ieeeProof}</p>
+  //                 )}
+  //               </div>
+  //             )}
 
-              <div className="space-y-3">
-                <Label>Nationality *</Label>
-                <RadioGroup
-                  value={formData.nationality}
-                  onValueChange={(value) => handleInputChange("nationality", value)}
-                  className={errors.nationality ? "border border-red-500 p-3 rounded" : ""}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="national" id="national" />
-                    <Label htmlFor="national">National (India)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="international" id="international" />
-                    <Label htmlFor="international">International</Label>
-                  </div>
-                </RadioGroup>
-                {errors.nationality && (
-                  <p className="text-sm text-red-500">{errors.nationality}</p>
-                )}
-              </div>
+  //             <div className="space-y-3">
+  //               <Label>Nationality *</Label>
+  //               <RadioGroup
+  //                 value={formData.nationality}
+  //                 onValueChange={(value) => handleInputChange("nationality", value)}
+  //                 className={errors.nationality ? "border border-red-500 p-3 rounded" : ""}
+  //               >
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="national" id="national" />
+  //                   <Label htmlFor="national">National (India)</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="international" id="international" />
+  //                   <Label htmlFor="international">International</Label>
+  //                 </div>
+  //               </RadioGroup>
+  //               {errors.nationality && (
+  //                 <p className="text-sm text-red-500">{errors.nationality}</p>
+  //               )}
+  //             </div>
 
-              {calculatedFee > 0 && (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-lg mb-2">Registration Fee Breakdown</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Base Fee:</span>
-                      <span className="font-medium">{baseFee} {currency}</span>
-                    </div>
-                    {gstAmount > 0 && (
-                      <div className="flex justify-between">
-                        <span>GST (18%):</span>
-                        <span className="font-medium">{Math.round(gstAmount)} {currency}</span>
-                      </div>
-                    )}
-                    <div className="border-t pt-2">
-                      <div className="flex justify-between">
-                        <span className="font-semibold">Total Amount:</span>
-                        <span className="text-2xl font-bold text-primary">
-                          {Math.round(calculatedFee)} {currency}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  {gstAmount === 0 && formData.nationality === "international" && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      * No GST applicable for international participants
-                    </p>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )
+  //             {calculatedFee > 0 && (
+  //               <div className="bg-blue-50 p-4 rounded-lg">
+  //                 <h3 className="font-semibold text-lg mb-2">Registration Fee Breakdown</h3>
+  //                 <div className="space-y-2">
+  //                   <div className="flex justify-between">
+  //                     <span>Base Fee:</span>
+  //                     <span className="font-medium">{baseFee} {currency}</span>
+  //                   </div>
+  //                   {gstAmount > 0 && (
+  //                     <div className="flex justify-between">
+  //                       <span>GST (18%):</span>
+  //                       <span className="font-medium">{Math.round(gstAmount)} {currency}</span>
+  //                     </div>
+  //                   )}
+  //                   <div className="border-t pt-2">
+  //                     <div className="flex justify-between">
+  //                       <span className="font-semibold">Total Amount:</span>
+  //                       <span className="text-2xl font-bold text-primary">
+  //                         {Math.round(calculatedFee)} {currency}
+  //                       </span>
+  //                     </div>
+  //                   </div>
+  //                 </div>
+  //                 {gstAmount === 0 && formData.nationality === "international" && (
+  //                   <p className="text-sm text-gray-600 mt-2">
+  //                     * No GST applicable for international participants
+  //                   </p>
+  //                 )}
+  //               </div>
+  //             )}
+  //           </CardContent>
+  //         </Card>
+  //       )
 
-      case 3:
-        return (
-          <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Paper Information
-              </CardTitle>
-              <CardDescription>Provide details about your paper submission</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="paperId">Paper ID *</Label>
-                <Input
-                  id="paperId"
-                  value={formData.paperId}
-                  onChange={(e) => handleInputChange("paperId", e.target.value)}
-                  placeholder="e.g., PID001"
-                  className={errors.paperId ? "border-red-500" : ""}
-                />
-                {errors.paperId && (
-                  <p className="text-sm text-red-500">{errors.paperId}</p>
-                )}
-              </div>
+  //     case 3:
+  //       return (
+  //         <Card className="w-full max-w-2xl mx-auto">
+  //           <CardHeader>
+  //             <CardTitle className="flex items-center gap-2">
+  //               <FileText className="h-5 w-5" />
+  //               Paper Information
+  //             </CardTitle>
+  //             <CardDescription>Provide details about your paper submission</CardDescription>
+  //           </CardHeader>
+  //           <CardContent className="space-y-4">
+  //             <div className="space-y-2">
+  //               <Label htmlFor="paperId">Paper ID *</Label>
+  //               <Input
+  //                 id="paperId"
+  //                 value={formData.paperId}
+  //                 onChange={(e) => handleInputChange("paperId", e.target.value)}
+  //                 placeholder="e.g., PID001"
+  //                 className={errors.paperId ? "border-red-500" : ""}
+  //               />
+  //               {errors.paperId && (
+  //                 <p className="text-sm text-red-500">{errors.paperId}</p>
+  //               )}
+  //             </div>
 
-              <div className="space-y-3">
-                <Label>Have you filled the Copyright Agreement? *</Label>
-                <RadioGroup
-                  value={formData.copyrightAgreement}
-                  onValueChange={(value) => handleInputChange("copyrightAgreement", value)}
-                  className={errors.copyrightAgreement ? "border border-red-500 p-3 rounded" : ""}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="copyright-yes" />
-                    <Label htmlFor="copyright-yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="copyright-no" />
-                    <Label htmlFor="copyright-no">No</Label>
-                  </div>
-                </RadioGroup>
-                {errors.copyrightAgreement && (
-                  <p className="text-sm text-red-500">{errors.copyrightAgreement}</p>
-                )}
-              </div>
+  //             <div className="space-y-3">
+  //               <Label>Have you filled the Copyright Agreement? *</Label>
+  //               <RadioGroup
+  //                 value={formData.copyrightAgreement}
+  //                 onValueChange={(value) => handleInputChange("copyrightAgreement", value)}
+  //                 className={errors.copyrightAgreement ? "border border-red-500 p-3 rounded" : ""}
+  //               >
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="yes" id="copyright-yes" />
+  //                   <Label htmlFor="copyright-yes">Yes</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="no" id="copyright-no" />
+  //                   <Label htmlFor="copyright-no">No</Label>
+  //                 </div>
+  //               </RadioGroup>
+  //               {errors.copyrightAgreement && (
+  //                 <p className="text-sm text-red-500">{errors.copyrightAgreement}</p>
+  //               )}
+  //             </div>
 
-             <div className="space-y-3">
-                <Label>Mode of Paper Presentation *</Label>
-                <RadioGroup
-                  value={formData.presentationMode}
-                  onValueChange={(value) => handleInputChange("presentationMode", value)}
-                  className={errors.presentationMode ? "border border-red-500 p-3 rounded" : ""}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="online" id="online" />
-                    <Label htmlFor="online">Online Mode</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="physical" id="physical" />
-                    <Label htmlFor="physical">Physical Mode</Label>
-                  </div>
-                </RadioGroup>
-                {errors.presentationMode && (
-                  <p className="text-sm text-red-500">{errors.presentationMode}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )
+  //            <div className="space-y-3">
+  //               <Label>Mode of Paper Presentation *</Label>
+  //               <RadioGroup
+  //                 value={formData.presentationMode}
+  //                 onValueChange={(value) => handleInputChange("presentationMode", value)}
+  //                 className={errors.presentationMode ? "border border-red-500 p-3 rounded" : ""}
+  //               >
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="online" id="online" />
+  //                   <Label htmlFor="online">Online Mode</Label>
+  //                 </div>
+  //                 <div className="flex items-center space-x-2">
+  //                   <RadioGroupItem value="physical" id="physical" />
+  //                   <Label htmlFor="physical">Physical Mode</Label>
+  //                 </div>
+  //               </RadioGroup>
+  //               {errors.presentationMode && (
+  //                 <p className="text-sm text-red-500">{errors.presentationMode}</p>
+  //               )}
+  //             </div>
+  //           </CardContent>
+  //         </Card>
+  //       )
 
-      case 4:
-        return (
-          <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" />
-                Payment & Confirmation
-              </CardTitle>
-              <CardDescription>Review your details and proceed to payment</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <h3 className="font-semibold">Registration Summary</h3>
-                <p><strong>Name:</strong> {formData.participantName}</p>
-                <p><strong>Email:</strong> {formData.email}</p>
-                <p><strong>Country:</strong> {formData.country}</p>
-                <p><strong>Category:</strong> {formData.category}</p>
-                <p><strong>IEEE Member:</strong> {formData.ieeeStatus === 'yes' ? 'Yes' : 'No'}</p>
-                <p><strong>Nationality:</strong> {formData.nationality}</p>
-                <p><strong>Paper ID:</strong> {formData.paperId}</p>
-                <p><strong>Presentation Mode:</strong> {formData.presentationMode}</p>
-              </div>
+  //     case 4:
+  //       return (
+  //         <Card className="w-full max-w-2xl mx-auto">
+  //           <CardHeader>
+  //             <CardTitle className="flex items-center gap-2">
+  //               <CheckCircle className="h-5 w-5" />
+  //               Payment & Confirmation
+  //             </CardTitle>
+  //             <CardDescription>Review your details and proceed to payment</CardDescription>
+  //           </CardHeader>
+  //           <CardContent className="space-y-6">
+  //             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+  //               <h3 className="font-semibold">Registration Summary</h3>
+  //               <p><strong>Name:</strong> {formData.participantName}</p>
+  //               <p><strong>Email:</strong> {formData.email}</p>
+  //               <p><strong>Country:</strong> {formData.country}</p>
+  //               <p><strong>Category:</strong> {formData.category}</p>
+  //               <p><strong>IEEE Member:</strong> {formData.ieeeStatus === 'yes' ? 'Yes' : 'No'}</p>
+  //               <p><strong>Nationality:</strong> {formData.nationality}</p>
+  //               <p><strong>Paper ID:</strong> {formData.paperId}</p>
+  //               <p><strong>Presentation Mode:</strong> {formData.presentationMode}</p>
+  //             </div>
 
-              {/* Enhanced Fee Breakdown */}
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="font-semibold text-lg mb-3">Payment Breakdown</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Registration Fee:</span>
-                    <span className="font-medium">{baseFee} {currency}</span>
-                  </div>
-                  {gstAmount > 0 && (
-                    <>
-                      <div className="flex justify-between text-sm">
-                        <span>GST (18%):</span>
-                        <span className="font-medium">+{Math.round(gstAmount)} {currency}</span>
-                      </div>
-                      <div className="border-t border-blue-200 pt-2">
-                        <div className="flex justify-between">
-                          <span className="font-semibold">Total Amount (Incl. GST):</span>
-                          <span className="text-xl font-bold text-primary">
-                            {Math.round(calculatedFee)} {currency}
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  {gstAmount === 0 && (
-                    <div className="border-t border-blue-200 pt-2">
-                      <div className="flex justify-between">
-                        <span className="font-semibold">Total Amount:</span>
-                        <span className="text-xl font-bold text-primary">
-                          {Math.round(calculatedFee)} {currency}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">
-                        * No GST applicable for international participants
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+  //             {/* Enhanced Fee Breakdown */}
+  //             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+  //               <h3 className="font-semibold text-lg mb-3">Payment Breakdown</h3>
+  //               <div className="space-y-2">
+  //                 <div className="flex justify-between text-sm">
+  //                   <span>Registration Fee:</span>
+  //                   <span className="font-medium">{baseFee} {currency}</span>
+  //                 </div>
+  //                 {gstAmount > 0 && (
+  //                   <>
+  //                     <div className="flex justify-between text-sm">
+  //                       <span>GST (18%):</span>
+  //                       <span className="font-medium">+{Math.round(gstAmount)} {currency}</span>
+  //                     </div>
+  //                     <div className="border-t border-blue-200 pt-2">
+  //                       <div className="flex justify-between">
+  //                         <span className="font-semibold">Total Amount (Incl. GST):</span>
+  //                         <span className="text-xl font-bold text-primary">
+  //                           {Math.round(calculatedFee)} {currency}
+  //                         </span>
+  //                       </div>
+  //                     </div>
+  //                   </>
+  //                 )}
+  //                 {gstAmount === 0 && (
+  //                   <div className="border-t border-blue-200 pt-2">
+  //                     <div className="flex justify-between">
+  //                       <span className="font-semibold">Total Amount:</span>
+  //                       <span className="text-xl font-bold text-primary">
+  //                         {Math.round(calculatedFee)} {currency}
+  //                       </span>
+  //                     </div>
+  //                     <p className="text-xs text-gray-600 mt-1">
+  //                       * No GST applicable for international participants
+  //                     </p>
+  //                   </div>
+  //                 )}
+  //               </div>
+  //             </div>
 
-              {!razorpayLoaded && (
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Loading payment gateway... Please wait.
-                  </AlertDescription>
-                </Alert>
-              )}
+  //             {!razorpayLoaded && (
+  //               <Alert>
+  //                 <AlertCircle className="h-4 w-4" />
+  //                 <AlertDescription>
+  //                   Loading payment gateway... Please wait.
+  //                 </AlertDescription>
+  //               </Alert>
+  //             )}
 
-              {uploadLoading && (
-                <Alert>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <AlertDescription>
-                    Uploading files... Please don't close this window.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-        )
+  //             {uploadLoading && (
+  //               <Alert>
+  //                 <Loader2 className="h-4 w-4 animate-spin" />
+  //                 <AlertDescription>
+  //                   Uploading files... Please don't close this window.
+  //                 </AlertDescription>
+  //               </Alert>
+  //             )}
+  //           </CardContent>
+  //         </Card>
+  //       )
 
-      default:
-        return null
-    }
-  }
+  //     default:
+  //       return null
+  //   }
+  // }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-orange-50">
       <Header />
       
-      {paymentLoading && <LoadingOverlay />}
-      
-      <section className="pb-20 pt-10 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Progress Steps */}
-            <div className="mb-8">
-              <div className="flex items-center justify-center space-x-4">
-                {[1, 2, 3, 4].map((step) => (
-                  <div key={step} className="flex items-center">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        currentStep >= step
-                          ? "bg-primary text-white"
-                          : "bg-gray-200 text-gray-500"
-                      }`}
-                    >
-                      {step}
-                    </div>
-                    {step < 4 && (
-                      <div
-                        className={`w-12 h-1 mx-2 ${
-                          currentStep > step ? "bg-primary" : "bg-gray-200"
-                        }`}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="text-center mt-4">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Conference Registration - Step {currentStep} of 4
-                </h2>
-              </div>
-            </div>
-
-            {/* Form Content */}
-            {renderStep()}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 max-w-2xl mx-auto">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentStep(prev => prev - 1)}
-                disabled={currentStep === 1 || loading || paymentLoading}
-              >
-                Previous
-              </Button>
-
-              {currentStep < 4 ? (
-                <Button 
-                  onClick={handleNextStep}
-                  disabled={loading || paymentLoading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      Loading...
-                    </>
-                  ) : (
-                    "Next"
-                  )}
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handlePayment} 
-                  disabled={loading || paymentLoading || !razorpayLoaded}
-                  className="min-w-[200px]"
-                >
-                  {paymentLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : !razorpayLoaded ? (
-                    "Loading Payment..."
-                  ) : (
-                    `Pay ${Math.round(calculatedFee)} ${currency}${gstAmount > 0 ? ' (Incl. GST)' : ''}`
-                  )}
-                </Button>
-              )}
-            </div>
-
-            {/* Important Notes */}
-            <div className="mt-8 max-w-2xl mx-auto">
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Important:</strong> Please ensure all information is correct before proceeding to payment. 
-                  Registration details cannot be modified after successful payment.
-                  {gstAmount > 0 && (
-                    <span className="block mt-1">
-                      * GST of 18% is applicable for Indian participants as per government regulations.
-                    </span>
-                  )}
-                </AlertDescription>
-              </Alert>
-            </div>
+     
+ <main className="min-h-screen bg-gradient-to-b from-white to-orange-50 flex items-center justify-center p-6">
+      <div className="max-w-md w-full text-center">
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+          {/* Success Icon */}
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          
+          {/* Main Message */}
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">
+            Thank You!
+          </h1>
+          
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Thanks for your overwhelming response. 
+            <br />
+            <span className="font-semibold text-orange-600">Event has been closed</span> 
+            <br />
+            and responses are no longer accepted.
+          </p>
+          
+          {/* Heart Icon */}
+          <div className="flex justify-center mb-6">
+            <Heart className="w-6 h-6 text-red-500 fill-current" />
+          </div>
+          
+          {/* Team Credit */}
+          <div className="pt-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500 mb-2">Thanks from the team</p>
+            <h3 className="text-xl font-bold text-orange-600">
+              ResGenX AI
+            </h3>
           </div>
         </div>
-      </section>
-
+      </div>
+    </main>
       <Footer />
     </main>
   )
