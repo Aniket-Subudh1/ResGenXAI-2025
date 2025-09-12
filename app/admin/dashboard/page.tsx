@@ -33,8 +33,12 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  RefreshCcw,
+  UserX,
+  DollarSign
 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface Registration {
   _id: string
@@ -60,6 +64,10 @@ interface Registration {
   registrationDate: string
   paymentProofUrl?: string
   ieeeProofUrl?: string
+  refundId?: string
+  refundDate?: string
+  refundReason?: string
+  refundAmount?: number
 }
 
 interface DashboardData {
@@ -78,15 +86,183 @@ interface DashboardData {
   recentRegistrations: Registration[]
   allRegistrations: Registration[]
   dailyRegistrations: Record<string, number>
+  duplicateEmails: Array<{email: string, count: number, registrations: Registration[]}>
+  duplicatePaperIds: Array<{paperId: string, count: number, registrations: Registration[]}>
+  refundedPayments: number
+  totalRefundAmount: number
 }
 
 interface DetailViewProps {
   registration: Registration
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  onRefund?: (registration: Registration) => void
 }
 
-const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => {
+interface RefundDialogProps {
+  registration: Registration | null
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  onRefundComplete: () => void
+}
+
+// USD to INR conversion rate (you should ideally fetch this from an API)
+const USD_TO_INR_RATE = 87.5 // Update this rate as needed
+
+// Currency conversion utility functions
+const convertToINR = (amount: number, currency: string): number => {
+  if (currency === 'USD') {
+    return amount * USD_TO_INR_RATE
+  }
+  return amount
+}
+
+const formatCurrencyDisplay = (amount: number, currency: string): string => {
+  const inrAmount = convertToINR(amount, currency)
+  if (currency === 'USD') {
+    return `₹${Math.round(inrAmount).toLocaleString()} (${amount} USD)`
+  }
+  return `₹${Math.round(inrAmount).toLocaleString()}`
+}
+
+const RefundDialog = ({ registration, isOpen, onOpenChange, onRefundComplete }: RefundDialogProps) => {
+  const [loading, setLoading] = useState(false)
+  const [reason, setReason] = useState("")
+  const [pin, setPin] = useState("")
+  const { toast } = useToast()
+
+  const handleRefund = async () => {
+    if (!registration || !pin) {
+      toast({
+        title: "Error",
+        description: "Please enter admin PIN",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch('/api/admin/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pin,
+          paymentId: registration.paymentId,
+          registrationId: registration.registrationId,
+          reason: reason || 'Admin initiated refund'
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        const displayAmount = formatCurrencyDisplay(data.amount, registration.currency)
+        toast({
+          title: "Success",
+          description: `Refund of ${displayAmount} processed successfully`
+        })
+        onRefundComplete()
+        onOpenChange(false)
+        setPin("")
+        setReason("")
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to process refund",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process refund",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <RefreshCcw className="w-5 h-5" />
+            Process Refund
+          </DialogTitle>
+        </DialogHeader>
+        
+        {registration && (
+          <div className="space-y-4">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm"><strong>Registration ID:</strong> {registration.registrationId}</p>
+              <p className="text-sm"><strong>Participant:</strong> {registration.participantName}</p>
+              <p className="text-sm"><strong>Amount:</strong> {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}</p>
+              <p className="text-sm"><strong>Payment ID:</strong> {registration.paymentId}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="refund-reason">Refund Reason</Label>
+              <Input
+                id="refund-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="e.g., Duplicate registration, Cancelled event"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="refund-pin">Admin PIN *</Label>
+              <Input
+                id="refund-pin"
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                placeholder="Enter admin PIN"
+              />
+            </div>
+
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                This action will process a full refund through Razorpay and update the registration status.
+              </AlertDescription>
+            </Alert>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleRefund}
+                disabled={loading || !pin}
+                className="flex-1"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  `Refund ${formatCurrencyDisplay(registration.calculatedFee, registration.currency)}`
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const DetailView = ({ registration, isOpen, onOpenChange, onRefund }: DetailViewProps) => {
   const hasGST = registration.gstAmount && registration.gstAmount > 0
   
   return (
@@ -217,17 +393,17 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   <div className="mt-2 space-y-1">
                     <div className="flex justify-between text-sm">
                       <span>Base Fee:</span>
-                      <span>{registration.baseFee || registration.calculatedFee} {registration.currency}</span>
+                      <span>{formatCurrencyDisplay(registration.baseFee || registration.calculatedFee, registration.currency)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>GST (18%):</span>
-                      <span>+{Math.round(registration.gstAmount)} {registration.currency}</span>
+                      <span>+{formatCurrencyDisplay(Math.round(registration.gstAmount), registration.currency)}</span>
                     </div>
                     <div className="border-t pt-1">
                       <div className="flex justify-between font-semibold">
                         <span>Total Amount:</span>
                         <span className="text-lg text-primary">
-                          {registration.calculatedFee} {registration.currency}
+                          {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}
                         </span>
                       </div>
                     </div>
@@ -237,7 +413,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Registration Fee</Label>
                   <p className="text-2xl font-bold text-primary">
-                    {registration.calculatedFee} {registration.currency}
+                    {formatCurrencyDisplay(registration.calculatedFee, registration.currency)}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">No GST applicable (International)</p>
                 </div>
@@ -248,10 +424,15 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                 <div className="flex items-center gap-2">
                   {registration.paymentStatus === 'completed' ? (
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  ) : registration.paymentStatus === 'refunded' ? (
+                    <RefreshCcw className="w-4 h-4 text-orange-500" />
                   ) : (
                     <XCircle className="w-4 h-4 text-red-500" />
                   )}
-                  <Badge variant={registration.paymentStatus === 'completed' ? 'default' : 'destructive'}>
+                  <Badge variant={
+                    registration.paymentStatus === 'completed' ? 'default' : 
+                    registration.paymentStatus === 'refunded' ? 'secondary' : 'destructive'
+                  }>
                     {registration.paymentStatus}
                   </Badge>
                 </div>
@@ -274,6 +455,32 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   </p>
                 </div>
               )}
+
+              {registration.refundId && (
+                <div className="bg-orange-50 p-3 rounded-lg border">
+                  <Label className="text-sm font-medium text-orange-800">Refund Information</Label>
+                  <div className="mt-2 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Refund ID:</span>
+                      <span className="font-mono">{registration.refundId}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Refund Amount:</span>
+                      <span>{formatCurrencyDisplay(registration.refundAmount || 0, registration.currency)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Refund Date:</span>
+                      <span>{registration.refundDate ? new Date(registration.refundDate).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    {registration.refundReason && (
+                      <div className="flex justify-between">
+                        <span>Reason:</span>
+                        <span>{registration.refundReason}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div>
                 <Label className="text-sm font-medium text-gray-600">Registration Date</Label>
@@ -282,6 +489,24 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                   <p>{new Date(registration.registrationDate).toLocaleString()}</p>
                 </div>
               </div>
+
+              {/* Admin Actions */}
+              {registration.paymentStatus === 'completed' && onRefund && (
+                <div className="pt-4 border-t">
+                  <Label className="text-sm font-medium text-gray-600">Admin Actions</Label>
+                  <div className="mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onRefund(registration)}
+                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                    >
+                      <RefreshCcw className="w-4 h-4 mr-2" />
+                      Process Refund
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -346,7 +571,7 @@ const DetailView = ({ registration, isOpen, onOpenChange }: DetailViewProps) => 
                 <div className="bg-green-50 p-2 rounded border">
                   <Label className="text-sm font-medium text-green-800">GST Information</Label>
                   <p className="text-xs text-green-700 mt-1">
-                    GST of {Math.round(registration.gstAmount)} {registration.currency} has been applied as per Indian tax regulations.
+                    GST of {formatCurrencyDisplay(Math.round(registration.gstAmount), registration.currency)} has been applied as per Indian tax regulations.
                     This registration serves as a GST invoice.
                   </p>
                 </div>
@@ -371,6 +596,8 @@ export default function AdminDashboard() {
   const [filterNationality, setFilterNationality] = useState("all")
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null)
   const [detailViewOpen, setDetailViewOpen] = useState(false)
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false)
+  const [refundTarget, setRefundTarget] = useState<Registration | null>(null)
   const { toast } = useToast()
 
   const handleLogin = async () => {
@@ -448,6 +675,14 @@ export default function AdminDashboard() {
   }
 
   const enrichDashboardData = (data: any): DashboardData => {
+    // Convert all amounts to INR for calculation
+    const totalAmountInINR = data.allRegistrations
+      .filter((reg: Registration) => reg.paymentStatus === 'completed')
+      .reduce((sum: number, reg: Registration) => {
+        const inrAmount = convertToINR(reg.calculatedFee, reg.currency)
+        return sum + inrAmount
+      }, 0)
+
     // Add additional breakdowns
     const nationalityBreakdown = data.allRegistrations.reduce((acc: Record<string, number>, reg: Registration) => {
       acc[reg.nationality] = (acc[reg.nationality] || 0) + 1
@@ -486,13 +721,47 @@ export default function AdminDashboard() {
       }
     })
 
+    // Find duplicate emails and paper IDs
+    const emailGroups = data.allRegistrations.reduce((acc: Record<string, Registration[]>, reg: Registration) => {
+      if (!acc[reg.email]) acc[reg.email] = []
+      acc[reg.email].push(reg)
+      return acc
+    }, {})
+
+    const duplicateEmails = Object.entries(emailGroups)
+      .filter(([_, registrations]) => (registrations as Registration[]).length > 1)
+      .map(([email, registrations]) => ({ email, count: (registrations as Registration[]).length, registrations: registrations as Registration[] }))
+
+    const paperIdGroups = data.allRegistrations.reduce((acc: Record<string, Registration[]>, reg: Registration) => {
+      if (!acc[reg.paperId]) acc[reg.paperId] = []
+      acc[reg.paperId].push(reg)
+      return acc
+    }, {})
+
+    const duplicatePaperIds = Object.entries(paperIdGroups)
+      .filter(([_, registrations]) => (registrations as Registration[]).length > 1)
+      .map(([paperId, registrations]) => ({ paperId, count: (registrations as Registration[]).length, registrations: registrations as Registration[] }))
+
+    // Calculate refund statistics (convert to INR)
+    const refundedRegistrations = data.allRegistrations.filter((reg: Registration) => reg.paymentStatus === 'refunded')
+    const refundedPayments = refundedRegistrations.length
+    const totalRefundAmountInINR = refundedRegistrations.reduce((sum: number, reg: Registration) => {
+      const inrAmount = convertToINR(reg.refundAmount || 0, reg.currency)
+      return sum + inrAmount
+    }, 0)
+
     return {
       ...data,
+      totalAmount: Math.round(totalAmountInINR), // Override with INR converted amount
       nationalityBreakdown,
       paymentStatusBreakdown,
       presentationModeBreakdown,
       countryBreakdown,
-      dailyRegistrations
+      dailyRegistrations,
+      duplicateEmails,
+      duplicatePaperIds,
+      refundedPayments,
+      totalRefundAmount: Math.round(totalRefundAmountInINR) // Override with INR converted amount
     }
   }
 
@@ -567,6 +836,15 @@ export default function AdminDashboard() {
     setDetailViewOpen(true)
   }
 
+  const handleRefund = (registration: Registration) => {
+    setRefundTarget(registration)
+    setRefundDialogOpen(true)
+  }
+
+  const handleRefundComplete = () => {
+    refreshData()
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-primary-900 to-secondary-900 flex items-center justify-center p-4">
@@ -630,6 +908,9 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-500 mt-1">
                 Last updated: {new Date().toLocaleString()}
               </p>
+              <p className="text-xs text-blue-600 mt-1">
+                * All amounts displayed in INR (USD amounts converted at rate: 1 USD = ₹{USD_TO_INR_RATE})
+              </p>
             </div>
             <div className="flex gap-2">
               <Button onClick={refreshData} variant="outline" disabled={refreshing}>
@@ -652,8 +933,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Enhanced Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
           <Card className="relative overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
@@ -695,33 +976,46 @@ export default function AdminDashboard() {
 
           <Card className="relative overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">IEEE Members</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Refunded</CardTitle>
+              <RefreshCcw className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardData.refundedPayments}</div>
+              <p className="text-xs text-muted-foreground">
+                ₹{dashboardData.totalRefundAmount.toLocaleString()} refunded
+              </p>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-red-600"></div>
+            </CardContent>
+          </Card>
+
+          <Card className="relative overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Duplicates Found</CardTitle>
+              <UserX className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {dashboardData.ieeeBreakdown['IEEE Members'] || 0}
+                {dashboardData.duplicateEmails.length + dashboardData.duplicatePaperIds.length}
               </div>
               <p className="text-xs text-muted-foreground">
-                {(((dashboardData.ieeeBreakdown['IEEE Members'] || 0) / dashboardData.totalRegistrations) * 100).toFixed(1)}% of total
+                {dashboardData.duplicateEmails.length} emails, {dashboardData.duplicatePaperIds.length} papers
               </p>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-600"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 to-yellow-600"></div>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="overview" className="space-x-6">
-  <TabsList className="flex flex-wrap justify-between w-full gap-2 sm:gap-4">
-    <TabsTrigger value="overview">Overview</TabsTrigger>
-    <TabsTrigger value="registrations">All Registrations</TabsTrigger>
-    <TabsTrigger value="analytics">Analytics</TabsTrigger>
-    <TabsTrigger value="insights">Insights</TabsTrigger>
-  </TabsList>
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="flex flex-wrap justify-between w-full gap-2 sm:gap-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="registrations">All Registrations</TabsTrigger>
+            <TabsTrigger value="duplicates">Duplicates</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="refunds">Refunds</TabsTrigger>
+          </TabsList>
 
-
-
-          <TabsContent value="overview" className="space-x-6">
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {/* Category Breakdown */}
               <Card>
                 <CardHeader>
@@ -770,12 +1064,17 @@ export default function AdminDashboard() {
                           <div className="flex items-center gap-2">
                             {status === 'completed' ? (
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            ) : status === 'refunded' ? (
+                              <RefreshCcw className="w-4 h-4 text-orange-500" />
                             ) : (
                               <Clock className="w-4 h-4 text-yellow-500" />
                             )}
                             <span className="capitalize">{status}</span>
                           </div>
-                          <Badge variant={status === 'completed' ? 'default' : 'secondary'}>
+                          <Badge variant={
+                            status === 'completed' ? 'default' : 
+                            status === 'refunded' ? 'secondary' : 'destructive'
+                          }>
                             {count} ({percentage}%)
                           </Badge>
                         </div>
@@ -829,7 +1128,10 @@ export default function AdminDashboard() {
                                 <Badge variant="outline" className="text-xs">
                                   {reg.category}
                                 </Badge>
-                                <Badge variant={reg.paymentStatus === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                                <Badge variant={
+                                  reg.paymentStatus === 'completed' ? 'default' : 
+                                  reg.paymentStatus === 'refunded' ? 'secondary' : 'destructive'
+                                } className="text-xs">
                                   {reg.paymentStatus}
                                 </Badge>
                               </div>
@@ -837,7 +1139,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium">{reg.calculatedFee} {reg.currency}</p>
+                          <p className="text-sm font-medium">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
                           <p className="text-xs text-gray-500">
                             {new Date(reg.registrationDate).toLocaleDateString()}
                           </p>
@@ -900,6 +1202,7 @@ export default function AdminDashboard() {
                         <SelectItem value="completed">Completed</SelectItem>
                         <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="failed">Failed</SelectItem>
+                        <SelectItem value="refunded">Refunded</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -954,7 +1257,7 @@ export default function AdminDashboard() {
                         <TableHead>Country</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead>IEEE</TableHead>
-                        <TableHead>Amount</TableHead>
+                        <TableHead>Amount (INR)</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Actions</TableHead>
@@ -978,16 +1281,21 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {reg.calculatedFee} {reg.currency}
+                            {formatCurrencyDisplay(reg.calculatedFee, reg.currency)}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
                               {reg.paymentStatus === 'completed' ? (
                                 <CheckCircle2 className="w-3 h-3 text-green-500" />
+                              ) : reg.paymentStatus === 'refunded' ? (
+                                <RefreshCcw className="w-3 h-3 text-orange-500" />
                               ) : (
                                 <Clock className="w-3 h-3 text-yellow-500" />
                               )}
-                              <Badge variant={reg.paymentStatus === 'completed' ? 'default' : 'destructive'}>
+                              <Badge variant={
+                                reg.paymentStatus === 'completed' ? 'default' : 
+                                reg.paymentStatus === 'refunded' ? 'secondary' : 'destructive'
+                              }>
                                 {reg.paymentStatus}
                               </Badge>
                             </div>
@@ -996,13 +1304,25 @@ export default function AdminDashboard() {
                             {new Date(reg.registrationDate).toLocaleDateString()}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => viewRegistrationDetails(reg)}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => viewRegistrationDetails(reg)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {reg.paymentStatus === 'completed' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleRefund(reg)}
+                                  className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                                >
+                                  <RefreshCcw className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -1013,6 +1333,117 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="duplicates" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Duplicate Emails */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Duplicate Emails ({dashboardData.duplicateEmails.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {dashboardData.duplicateEmails.length === 0 ? (
+                      <p className="text-gray-500 text-center py-4">No duplicate emails found</p>
+                    ) : (
+                      dashboardData.duplicateEmails.map(({ email, count, registrations }) => (
+                        <div key={email} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <p className="font-medium text-sm">{email}</p>
+                            <Badge variant="destructive">{count} registrations</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            {registrations.map(reg => (
+                              <div key={reg._id} className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
+                                <div>
+                                  <p className="font-medium">{reg.registrationId}</p>
+                                  <p className="text-gray-600">{reg.participantName}</p>
+                                </div>
+                                <div className="text-right">
+                                  <Badge variant={
+                                    reg.paymentStatus === 'completed' ? 'default' : 
+                                    reg.paymentStatus === 'refunded' ? 'secondary' : 'destructive'
+                                  } className="text-xs">
+                                    {reg.paymentStatus}
+                                  </Badge>
+                                  <p className="text-gray-500 mt-1">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => viewRegistrationDetails(reg)}
+                                  className="ml-2"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Duplicate Paper IDs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Duplicate Paper IDs ({dashboardData.duplicatePaperIds.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {dashboardData.duplicatePaperIds.length === 0 ? (
+                      <p className="text-gray-500 text-center py-4">No duplicate paper IDs found</p>
+                    ) : (
+                      dashboardData.duplicatePaperIds.map(({ paperId, count, registrations }) => (
+                        <div key={paperId} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <p className="font-medium text-sm font-mono">{paperId}</p>
+                            <Badge variant="destructive">{count} registrations</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            {registrations.map(reg => (
+                              <div key={reg._id} className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
+                                <div>
+                                  <p className="font-medium">{reg.registrationId}</p>
+                                  <p className="text-gray-600">{reg.participantName}</p>
+                                  <p className="text-gray-500">{reg.email}</p>
+                                </div>
+                                <div className="text-right">
+                                  <Badge variant={
+                                    reg.paymentStatus === 'completed' ? 'default' : 
+                                    reg.paymentStatus === 'refunded' ? 'secondary' : 'destructive'
+                                  } className="text-xs">
+                                    {reg.paymentStatus}
+                                  </Badge>
+                                  <p className="text-gray-500 mt-1">{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => viewRegistrationDetails(reg)}
+                                  className="ml-2"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Revenue by Category */}
@@ -1020,7 +1451,7 @@ export default function AdminDashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4" />
-                    Revenue by Category
+                    Revenue by Category (INR)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1028,7 +1459,10 @@ export default function AdminDashboard() {
                     {Object.entries(dashboardData.categoryBreakdown).map(([category, count]) => {
                       const categoryRevenue = dashboardData.allRegistrations
                         .filter(reg => reg.category === category && reg.paymentStatus === 'completed')
-                        .reduce((sum, reg) => sum + reg.calculatedFee, 0)
+                        .reduce((sum, reg) => {
+                          const inrAmount = convertToINR(reg.calculatedFee, reg.currency)
+                          return sum + inrAmount
+                        }, 0)
                       
                       const percentage = ((categoryRevenue / dashboardData.totalAmount) * 100).toFixed(1)
                       
@@ -1036,7 +1470,7 @@ export default function AdminDashboard() {
                         <div key={category} className="space-y-2">
                           <div className="flex justify-between items-center">
                             <span className="capitalize text-sm">{category.replace('-', ' ')}</span>
-                            <span className="font-medium">₹{categoryRevenue.toLocaleString()}</span>
+                            <span className="font-medium">₹{Math.round(categoryRevenue).toLocaleString()}</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
@@ -1144,96 +1578,108 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Key Metrics */}
+          <TabsContent value="refunds" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <RefreshCcw className="w-4 h-4" />
+                    Total Refunds
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{dashboardData.refundedPayments}</div>
+                  <p className="text-sm text-gray-600">Refunded registrations</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Refund Amount
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">₹{dashboardData.totalRefundAmount.toLocaleString()}</div>
+                  <p className="text-sm text-gray-600">Total refunded (INR)</p>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    Key Insights
+                    Refund Rate
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900">Registration Completion Rate</h4>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {((dashboardData.completedPayments / dashboardData.totalRegistrations) * 100).toFixed(1)}%
-                    </p>
-                    <p className="text-sm text-blue-700">
-                      {dashboardData.completedPayments} out of {dashboardData.totalRegistrations} registrations completed
-                    </p>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {((dashboardData.refundedPayments / dashboardData.totalRegistrations) * 100).toFixed(1)}%
                   </div>
-                  
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <h4 className="font-medium text-green-900">Average Registration Fee</h4>
-                    <p className="text-2xl font-bold text-green-600">
-                      ₹{Math.round(dashboardData.totalAmount / dashboardData.completedPayments || 0).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-green-700">Per completed registration</p>
-                  </div>
-
-                  <div className="p-3 bg-purple-50 rounded-lg">
-                    <h4 className="font-medium text-purple-900">IEEE Membership Rate</h4>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {(((dashboardData.ieeeBreakdown['IEEE Members'] || 0) / dashboardData.totalRegistrations) * 100).toFixed(1)}%
-                    </p>
-                    <p className="text-sm text-purple-700">
-                      {dashboardData.ieeeBreakdown['IEEE Members'] || 0} IEEE members registered
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Action Items */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    Action Items
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {dashboardData.totalRegistrations - dashboardData.completedPayments > 0 && (
-                    <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg">
-                      <AlertCircle className="w-4 h-4 text-yellow-600 mt-1" />
-                      <div>
-                        <h4 className="font-medium text-yellow-900">Pending Payments</h4>
-                        <p className="text-sm text-yellow-700">
-                          {dashboardData.totalRegistrations - dashboardData.completedPayments} registrations have pending payments
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {dashboardData.allRegistrations.filter(reg => 
-                    reg.ieeeStatus === 'yes' && !reg.ieeeProofUrl
-                  ).length > 0 && (
-                    <div className="flex items-start gap-2 p-3 bg-red-50 rounded-lg">
-                      <XCircle className="w-4 h-4 text-red-600 mt-1" />
-                      <div>
-                        <h4 className="font-medium text-red-900">Missing IEEE Proofs</h4>
-                        <p className="text-sm text-red-700">
-                          {dashboardData.allRegistrations.filter(reg => 
-                            reg.ieeeStatus === 'yes' && !reg.ieeeProofUrl
-                          ).length} IEEE members haven't uploaded proof
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-1" />
-                    <div>
-                      <h4 className="font-medium text-green-900">All Systems Operational</h4>
-                      <p className="text-sm text-green-700">
-                        Registration system is working properly
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-600">Of total registrations</p>
                 </CardContent>
               </Card>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Refunded Registrations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Registration ID</TableHead>
+                        <TableHead>Participant</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Original Amount</TableHead>
+                        <TableHead>Refund Amount (INR)</TableHead>
+                        <TableHead>Refund Date</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dashboardData.allRegistrations
+                        .filter(reg => reg.paymentStatus === 'refunded')
+                        .map((reg) => (
+                          <TableRow key={reg._id} className="hover:bg-gray-50">
+                            <TableCell className="font-mono text-sm">{reg.registrationId}</TableCell>
+                            <TableCell className="font-medium">{reg.participantName}</TableCell>
+                            <TableCell>{reg.email}</TableCell>
+                            <TableCell>{formatCurrencyDisplay(reg.calculatedFee, reg.currency)}</TableCell>
+                            <TableCell className="font-medium text-orange-600">
+                              {formatCurrencyDisplay(reg.refundAmount || reg.calculatedFee, reg.currency)}
+                            </TableCell>
+                            <TableCell>
+                              {reg.refundDate ? new Date(reg.refundDate).toLocaleDateString() : 'N/A'}
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm">{reg.refundReason || 'N/A'}</span>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => viewRegistrationDetails(reg)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                  {dashboardData.allRegistrations.filter(reg => reg.paymentStatus === 'refunded').length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No refunded registrations found
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
@@ -1243,8 +1689,17 @@ export default function AdminDashboard() {
             registration={selectedRegistration}
             isOpen={detailViewOpen}
             onOpenChange={setDetailViewOpen}
+            onRefund={handleRefund}
           />
         )}
+
+        {/* Refund Dialog */}
+        <RefundDialog
+          registration={refundTarget}
+          isOpen={refundDialogOpen}
+          onOpenChange={setRefundDialogOpen}
+          onRefundComplete={handleRefundComplete}
+        />
       </div>
     </div>
   )

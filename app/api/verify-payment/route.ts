@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
+    // Verify payment signature
     const body = razorpay_order_id + '|' + razorpay_payment_id
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
@@ -58,7 +59,8 @@ export async function POST(request: NextRequest) {
 
     if (expectedSignature !== razorpay_signature) {
       return NextResponse.json({ 
-        error: 'Invalid payment signature' 
+        error: 'Invalid payment signature',
+        code: 'PAYMENT_VERIFICATION_FAILED'
       }, { status: 400 })
     }
 
@@ -66,16 +68,57 @@ export async function POST(request: NextRequest) {
     const db = client.db('conference')
     const registrations = db.collection('registrations')
 
+    // Final duplicate check before saving (race condition protection)
     const existingRegistration = await registrations.findOne({
       $or: [
-        { email: registrationData.email },
-        { paymentId: razorpay_payment_id }
+        { email: registrationData.email.toLowerCase().trim() },
+        { paymentId: razorpay_payment_id },
+        { orderId: razorpay_order_id }
       ]
     })
 
     if (existingRegistration) {
+      // If this exact payment already exists, return success (duplicate webhook)
+      if (existingRegistration.paymentId === razorpay_payment_id) {
+        return NextResponse.json({ 
+          success: true, 
+          registrationId: existingRegistration.registrationId,
+          message: 'Registration already completed',
+          isDuplicate: true,
+          participantName: existingRegistration.participantName,
+          email: existingRegistration.email,
+          paymentId: razorpay_payment_id,
+          amount: `${existingRegistration.calculatedFee} ${existingRegistration.currency}`
+        })
+      }
+
+      // Email already registered
+      if (existingRegistration.email === registrationData.email.toLowerCase().trim()) {
+        return NextResponse.json({ 
+          error: 'This email is already registered for the conference',
+          code: 'EMAIL_ALREADY_REGISTERED',
+          existingRegistrationId: existingRegistration.registrationId
+        }, { status: 409 })
+      }
+
+      // Order ID already used (shouldn't happen but safety check)
+      if (existingRegistration.orderId === razorpay_order_id) {
+        return NextResponse.json({ 
+          error: 'This order has already been processed',
+          code: 'ORDER_ALREADY_PROCESSED'
+        }, { status: 409 })
+      }
+    }
+
+    // Check for duplicate paper ID
+    const existingPaper = await registrations.findOne({
+      paperId: registrationData.paperId.trim()
+    })
+
+    if (existingPaper) {
       return NextResponse.json({ 
-        error: 'Registration already exists for this email or payment ID' 
+        error: 'This Paper ID is already registered',
+        code: 'PAPER_ID_DUPLICATE'
       }, { status: 409 })
     }
 
@@ -121,7 +164,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const insertResult = await registrations.insertOne(registrationRecord)
+    // Use upsert to handle any race conditions
+    const insertResult = await registrations.replaceOne(
+      { paymentId: razorpay_payment_id },
+      registrationRecord,
+      { upsert: true }
+    )
     
     if (!insertResult.acknowledged) {
       throw new Error('Failed to save registration to database')
@@ -137,12 +185,13 @@ export async function POST(request: NextRequest) {
       totalAmount: registrationData.calculatedFee
     })
 
+    // Send confirmation email (don't fail registration if email fails)
     try {
       await sendConfirmationEmail(registrationRecord)
       console.log('Confirmation email sent to:', registrationData.email)
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError)
-
+      // Continue with success response even if email fails
     }
 
     return NextResponse.json({ 
@@ -169,6 +218,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       error: 'Payment verification failed',
+      code: 'VERIFICATION_ERROR',
       details: 'Please contact support if the problem persists.'
     }, { status: 500 })
   }
