@@ -104,10 +104,10 @@ export default function AttendHero() {
             <Users className="w-10 h-10 text-white" />
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Attend ResGenXAI 2025</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">ResGenXAI 2025 - Conference Concluded</h1>
 
           <p className="text-xl text-orange-100 mb-8 leading-relaxed">
-            Join us in Bhubaneswar for an enriching experience at the forefront of AI research and innovation
+            ResGenXAI 2025 was successfully held in Bhubaneswar, bringing together researchers and innovators at the forefront of AI research
           </p>
         </div>
       </div>

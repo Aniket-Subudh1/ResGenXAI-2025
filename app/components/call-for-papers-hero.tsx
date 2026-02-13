@@ -101,14 +101,14 @@ export default function CallForPapersHero() {
           }`}
         >
           <span className="inline-block bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white font-medium tracking-wider text-sm mb-6">
-            IEEE Conference Record #64788
+            IEEE Conference Record #64788 - Conference Concluded
           </span>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Call for Papers</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Call for Papers (Archived)</h1>
 
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            The International Conference on Responsible, Generative and Explainable AI (ResGenXAI-2025) invites
-            high-quality research papers focusing on recent advancements in artificial intelligence.
+            The International Conference on Responsible, Generative and Explainable AI (ResGenXAI-2025) successfully received
+            671 submissions from 8 countries, with 67 high-quality papers published in IEEE Xplore.
           </p>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Attend ResGenXAI 2025 | Conference Information",
-  description: "Join us in Bhubaneswar for ResGenXAI 2025. Information about registration, venue, accommodation, and conference code of conduct for the International Conference on Responsible, Generative and Explainable AI.",
+  title: "ResGenXAI 2025 Conference Information | Event Concluded",
+  description: "ResGenXAI 2025 was held in Bhubaneswar, September 10-12, 2025. Information about the conference venue, code of conduct, and event details for the International Conference on Responsible, Generative and Explainable AI.",
   keywords: [
     "conference registration", 
     "AI conference attendance", 
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     "academic conference attendance"
   ],
   openGraph: {
-    title: "Attend ResGenXAI 2025 | Conference Information",
-    description: "Join us in Bhubaneswar for ResGenXAI 2025. Information about registration, venue, accommodation, and conference code of conduct.",
+    title: "ResGenXAI 2025 Conference Information | Event Concluded",
+    description: "ResGenXAI 2025 was held in Bhubaneswar, September 10-12, 2025. Information about the conference venue and event details.",
     url: "https://www.resgenxai.co.in/attend",
     images: [
       {
@@ -39,10 +39,10 @@ const jsonLd = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "When and where is ResGenXAI 2025 being held?",
+      "name": "When and where was ResGenXAI 2025 held?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "ResGenXAI 2025 will take place from September 10-12, 2025, at Centurion University of Technology and Management in Bhubaneswar, Odisha, India."
+        "text": "ResGenXAI 2025 took place from September 10-12, 2025, at Centurion University of Technology and Management in Bhubaneswar, Odisha, India."
       }
     },
     {
@@ -63,18 +63,18 @@ const jsonLd = {
     },
     {
       "@type": "Question",
-      "name": "Are there accommodations available near the conference venue?",
+      "name": "Were there accommodations available near the conference venue?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Special rates have been arranged at several hotels near the conference venue. Registered participants will receive information about accommodation options and booking instructions. For accommodation-related queries, please contact the conference secretariat."
+        "text": "Special rates were arranged at several hotels near the conference venue for ResGenXAI 2025 participants."
       }
     },
     {
       "@type": "Question",
-      "name": "How can I get to the conference venue?",
+      "name": "How did attendees reach the conference venue?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Bhubaneswar is well-connected by air, rail, and road. The Biju Patnaik International Airport (BBI) is approximately 20 km from the conference venue. Shuttle services will be provided from selected hotels to the conference venue."
+        "text": "Bhubaneswar is well-connected by air, rail, and road. The Biju Patnaik International Airport (BBI) is approximately 20 km from the conference venue. Shuttle services were provided from selected hotels to the conference venue."
       }
     }
   ]

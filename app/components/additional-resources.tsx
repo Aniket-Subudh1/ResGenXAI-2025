@@ -34,17 +34,17 @@ export default function AdditionalResources() {
             </p>
 
             <div className="bg-blue-50 p-6 rounded-xl my-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Paper Submission</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Published Proceedings</h3>
               <p>
-                The Microsoft CMT service was used for managing the peer-reviewing process for this conference. This
-                service was provided for free by Microsoft and they bore all expenses, including costs for Azure cloud
-                services as well as for software development and support.
+                ResGenXAI 2025 successfully used Microsoft CMT service for managing the peer-reviewing process.
+                All accepted papers are now published and available on IEEE Xplore. View our high-quality proceedings
+                featuring 67 papers selected from 671 submissions across 8 countries.
               </p>
 
               <div className="mt-6 flex justify-center">
-                <Link href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025">
+                <Link href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding">
                 <Button className="bg-primary hover:bg-primary/90 text-white px-8 rounded-full flex items-center gap-2">
-                  Submit Paper
+                  View Proceedings
                   <ExternalLink className="w-4 h-4" />
                 </Button>
                 </Link>

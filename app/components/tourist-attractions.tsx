@@ -87,8 +87,7 @@ export default function TouristAttractions() {
 
           <div className="mt-12 text-center">
             <p className="text-gray-600 italic">
-              The conference will organize guided tours to these attractions. Details will be provided during
-              registration.
+              The conference organized guided tours to these attractions for participants during ResGenXAI 2025.
             </p>
           </div>
         </div>

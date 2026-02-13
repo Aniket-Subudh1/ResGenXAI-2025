@@ -29,7 +29,7 @@ export default function VenueInfo() {
                 Centurion University of Technology and Management
               </h3>
               <p className="text-gray-600">
-                The conference will be held at the state-of-the-art facilities of Centurion University of Technology and
+                The conference was held at the state-of-the-art facilities of Centurion University of Technology and
                 Management in Bhubaneswar, Odisha, India.
               </p>
 
@@ -79,27 +79,27 @@ export default function VenueInfo() {
                 <div>
                   <h4 className="font-bold text-gray-900 flex items-center">
                     <Clock className="w-5 h-5 text-primary mr-2" />
-                    Conference Hours
+                    Conference Details
                   </h4>
                   <p className="text-gray-600">
-                    Will be available soon.
+                    ResGenXAI 2025 was held September 10-12, 2025.
                   </p>
 
                   <h4 className="font-bold text-gray-900 mt-4 flex items-center">
                     <Coffee className="w-5 h-5 text-primary mr-2" />
-                    Refreshments
+                    Event Facilities
                   </h4>
                   <p className="text-gray-600">
-                    Coffee breaks will be provided in the morning and afternoon each day. Refreshments will be available
+                    Coffee breaks were provided in the morning and afternoon each day. Refreshments were available
                     throughout the conference.
                   </p>
 
                   <h4 className="font-bold text-gray-900 mt-4 flex items-center">
                     <Utensils className="w-5 h-5 text-primary mr-2" />
-                    Lunch
+                    Meals
                   </h4>
                   <p className="text-gray-600">
-                    Lunch will be provided for all registered attendees. Vegetarian and non-vegetarian options will be
+                    Lunch was provided for all registered attendees. Vegetarian and non-vegetarian options were
                     available.
                   </p>
                 </div>
@@ -128,8 +128,7 @@ export default function VenueInfo() {
             <div className="bg-white p-6 rounded-xl shadow-md pattachitra-border my-8">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Accommodation</h3>
               <p className="text-gray-600">
-                We have arranged special rates at several hotels near the conference venue. Registered participants will
-                receive information about accommodation options and booking instructions.
+                Special rates were arranged at several hotels near the conference venue for ResGenXAI 2025 participants.
               </p>
               <p className="text-gray-600 mt-4">
                 For any accommodation-related queries, please contact the conference secretariat at{" "}
@@ -147,8 +146,7 @@ export default function VenueInfo() {
                 approximately 20 km from the conference venue.
               </p>
               <p className="text-gray-600 mt-4">
-                Shuttle services will be provided from selected hotels to the conference venue. Details will be shared
-                with registered participants closer to the conference dates.
+                Shuttle services were provided from selected hotels to the conference venue for ResGenXAI 2025.
               </p>
             </div>
           </div>

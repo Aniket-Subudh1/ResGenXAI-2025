@@ -303,9 +303,9 @@ export default function RegistrationSuccessContent() {
                 <div className="flex items-start gap-3 text-left">
                   <Calendar className="w-5 h-5 text-purple-500 mt-1" />
                   <div>
-                    <h3 className="font-semibold">Save the Date</h3>
+                    <h3 className="font-semibold">Conference Dates</h3>
                     <p className="text-gray-600 text-sm">
-                      ResGenXAI 2025 will be held on <strong>September 10-12, 2025</strong> at 
+                      ResGenXAI 2025 was held on <strong>September 10-12, 2025</strong> at 
                       Centurion University of Technology and Management, Bhubaneswar, Odisha, India.
                     </p>
                   </div>
@@ -314,10 +314,10 @@ export default function RegistrationSuccessContent() {
                 <div className="flex items-start gap-3 text-left">
                   <FileText className="w-5 h-5 text-orange-500 mt-1" />
                   <div>
-                    <h3 className="font-semibold">Prepare Your Presentation</h3>
+                    <h3 className="font-semibold">Presentation Mode</h3>
                     <p className="text-gray-600 text-sm">
-                      Since you've selected <strong>{registrationDetails.presentationMode}</strong> mode for your paper presentation, 
-                      detailed guidelines will be shared with you via email closer to the conference date.
+                      Your paper was registered for <strong>{registrationDetails.presentationMode}</strong> mode presentation 
+                      at ResGenXAI 2025.
                     </p>
                   </div>
                 </div>
@@ -327,8 +327,8 @@ export default function RegistrationSuccessContent() {
                   <div>
                     <h3 className="font-semibold">Certificate & Proceedings</h3>
                     <p className="text-gray-600 text-sm">
-                      Your participation certificate and conference proceedings will be available 
-                      for download after the successful completion of the event.
+                      Conference proceedings are now published on IEEE Xplore. Participation certificates 
+                      were distributed to all registered attendees.
                     </p>
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function RegistrationSuccessContent() {
                       <div>
                         <h4 className="font-semibold text-gray-900">Conference Dates</h4>
                         <p className="text-gray-600">September 10-12, 2025</p>
-                        <p className="text-sm text-gray-500">3 days of cutting-edge AI research</p>
+                        <p className="text-sm text-gray-500">Successfully concluded with 671 submissions</p>
                       </div>
                     </div>
                     
@@ -420,10 +420,10 @@ export default function RegistrationSuccessContent() {
                 <div className="flex items-start gap-2">
                   <FileText className="w-5 h-5 text-blue-600 mt-1" />
                   <div>
-                    <h4 className="font-semibold text-blue-900">Keep Your Documents Safe</h4>
+                    <h4 className="font-semibold text-blue-900">Registration Record</h4>
                     <p className="text-sm text-blue-800 mt-1">
-                      Please keep your registration ID ({registrationDetails.registrationId}) and payment details safe. 
-                      You may need them during the conference check-in process.
+                      Your registration ID ({registrationDetails.registrationId}) serves as confirmation 
+                      of your participation in ResGenXAI 2025.
                     </p>
                   </div>
                 </div>
@@ -433,10 +433,10 @@ export default function RegistrationSuccessContent() {
                 <div className="flex items-start gap-2">
                   <Calendar className="w-5 h-5 text-green-600 mt-1" />
                   <div>
-                    <h4 className="font-semibold text-green-900">Stay Updated</h4>
+                    <h4 className="font-semibold text-green-900">Future Editions</h4>
                     <p className="text-sm text-green-800 mt-1">
-                      Follow our official website and check your email regularly for the latest updates, 
-                      schedule announcements, and important conference information.
+                      Interested in future editions of ResGenXAI? Register your interest through our 
+                      Interest Form to be notified about upcoming conferences.
                     </p>
                   </div>
                 </div>

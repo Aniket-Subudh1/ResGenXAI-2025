@@ -79,23 +79,23 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-lg mb-6 text-primary">Important Dates</h3>
+            <h3 className="font-bold text-lg mb-6 text-primary">ResGenXAI 2025 Highlights</h3>
             <ul className="space-y-3">
               <li className="text-gray-400">
-                <span className="block text-temple-gold">20th July, 2025</span>
-                Final Paper Submission
+                <span className="block text-temple-gold">671 Submissions</span>
+                From 8 Countries
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">11th August, 2025</span>
-                Acceptance Notification
+                <span className="block text-temple-gold">67 Papers</span>
+                Published in IEEE Xplore
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">20th August, 2025</span>
-                Camera Ready Submission
+                <span className="block text-temple-gold">10% Acceptance</span>
+                Maintaining High Standards
               </li>
               <li className="text-gray-400">
-                <span className="block text-temple-gold">25th August, 2025</span>
-                Registration Deadline
+                <span className="block text-temple-gold">Conference Concluded</span>
+                Successfully in 2025
               </li>
             </ul>
           </div>

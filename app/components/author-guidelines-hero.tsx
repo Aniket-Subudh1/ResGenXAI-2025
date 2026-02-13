@@ -104,10 +104,10 @@ export default function AuthorGuidelinesHero() {
             <FileText className="w-10 h-10 text-white" />
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Author Guidelines</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Author Guidelines (Archived)</h1>
 
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            Comprehensive instructions for preparing and submitting your research paper to ResGenXAI 2025
+            Historical reference: Instructions used for preparing and submitting research papers to ResGenXAI 2025
           </p>
         </div>
       </div>

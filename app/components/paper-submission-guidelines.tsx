@@ -19,23 +19,28 @@ export default function PaperSubmissionGuidelines() {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Camera-Ready Paper Submissions</h2>
 
           <div className="prose prose-lg max-w-none">
+            <div className="bg-blue-50 border-l-4 border-primary p-6 rounded-r-xl shadow-md mb-8">
+              <p className="font-semibold text-gray-900 mb-2">📌 Historical Information</p>
+              <p className="text-gray-700">
+                This page contains archival information about the submission guidelines for ResGenXAI 2025.
+                The conference has concluded and proceedings are now available on IEEE Xplore.
+              </p>
+            </div>
+
             <div className="bg-white p-6 rounded-xl shadow-md my-8">
               <div className="space-y-6">
                 <div>
                   <h4 className="font-bold text-gray-900">Final Submission Deadline:</h4>
                   <p>
-                    The final camera-ready manuscript must be submitted no later than June 30, 2025. Late submissions
-                    may not be included in the conference proceedings.
+                    The final camera-ready manuscript was required by June 30, 2025.
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-bold text-gray-900">IEEE Copyright Form:</h4>
                   <p>
-                    A signed IEEE Copyright Form is required for each accepted paper. This form must be completed and
-                    submitted along with the final paper. The ResGenXAI 2025 conference will use the IEEE Electronic
-                    Copyright (eCF) service for this process. The form can be accessed via the link provided after
-                    submitting your final paper.
+                    A signed IEEE Copyright Form was required for each accepted paper. The ResGenXAI 2025 conference used the IEEE Electronic
+                    Copyright (eCF) service for this process.
                   </p>
                 </div>
 

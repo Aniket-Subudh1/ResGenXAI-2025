@@ -159,7 +159,17 @@ export default function Hero() {
               <span className="text-white font-medium tracking-wider text-sm">HYBRID MODE</span>
             </div>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
-              <span className="block">2025 International Conference on</span>
+              <span className="block">
+                <a 
+                  href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-temple-gold transition-colors underline decoration-temple-gold decoration-2 underline-offset-4"
+                >
+                  PROCEEDINGS
+                </a>
+                {" "}International Conference on
+              </span>
               <span className="block text-temple-gold">Responsible, Generative</span>
               <span className="block">and Explainable AI</span>
             </h1>
@@ -170,19 +180,22 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/call-for-papers">
+              <Link href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding">
                 <Button
                   size="lg"
                   className="bg-white hover:bg-orange-50 text-primary px-8 rounded-full group transition-all duration-300"
                 >
-                  Call for Papers
+                  View Proceedings
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="https://conferences.ieee.org/conferences_events/conferences/conferencedetails/64788">
-              <Button size="lg" variant="outline" className="border-white text-primary hover:bg-white/20 rounded-full">
-                Learn More
-              </Button>
+              <Link href="/registration">
+                <Button 
+                  size="lg" 
+                  className="bg-temple-gold hover:bg-yellow-500 text-gray-900 font-semibold px-8 rounded-full border-2 border-temple-gold hover:border-yellow-500 transition-all duration-300"
+                >
+                  Interest Form
+                </Button>
               </Link>
             </div>
           </div>

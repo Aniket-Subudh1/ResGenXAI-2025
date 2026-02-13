@@ -75,38 +75,38 @@ export default function CallToAction() {
             inView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          <span className="text-blue-300 font-medium tracking-wider">JOIN US IN BHUBANESWAR</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mt-4 mb-6">Be Part of the Future of AI Research</h2>
+          <span className="text-blue-300 font-medium tracking-wider">STAY CONNECTED</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mt-4 mb-6">Interested in Future Editions?</h2>
           <p className="text-xl text-blue-100 mb-10">
-            Register for the conference and join the global community of AI researchers advancing responsible,
-            generative, and explainable AI.
+            ResGenXAI 2025 was a tremendous success! Register your interest to be notified about future conferences
+            and continue being part of our AI research community.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-             <Link href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025">
-              <Button size="lg" variant="outline" className="border-white text-primary hover:bg-white/20 rounded-full">
-                Be an Author
+             <Link href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding">
+              <Button size="lg" className="bg-white/90 backdrop-blur-sm text-primary hover:bg-white font-semibold border-2 border-white rounded-full transition-all duration-300">
+                View 2025 Proceedings
               </Button>
             </Link>
-            <Link href="https://forms.zohopublic.in/saneevdas061995gm1/form/ReviewerRequestForm/formperma/mJGeeXTvBB656ZOOzWxFvXH4kLheJXg6rDNAI6myrsQ?zf_rszfm=1">
-              <Button size="lg" variant="outline" className="border-white text-primary hover:bg-white/20 rounded-full">
-                Be a Reviewer
+            <Link href="/registration">
+              <Button size="lg" className="bg-temple-gold hover:bg-yellow-500 text-gray-900 font-semibold border-2 border-temple-gold hover:border-yellow-500 rounded-full transition-all duration-300">
+                Register Interest for Next Edition
               </Button>
             </Link>
           </div>
 
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl transform transition-transform hover:scale-105">
-              <h3 className="text-xl font-bold text-white mb-2">Attend Sessions</h3>
-              <p className="text-blue-100">Engage with cutting-edge research in responsible and explainable AI</p>
+              <h3 className="text-xl font-bold text-white mb-2">671 Submissions</h3>
+              <p className="text-blue-100">From 8 countries worldwide - an incredible response for our inaugural event</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl transform transition-transform hover:scale-105">
-              <h3 className="text-xl font-bold text-white mb-2">Network & Collaborate</h3>
-              <p className="text-blue-100">Connect with leading researchers and industry professionals</p>
+              <h3 className="text-xl font-bold text-white mb-2">67 Papers Published</h3>
+              <p className="text-blue-100">Maintaining a strict 10% acceptance rate for highest quality</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl transform transition-transform hover:scale-105">
-              <h3 className="text-xl font-bold text-white mb-2">Explore Bhubaneswar</h3>
-              <p className="text-blue-100">Experience the rich culture and heritage of Odisha</p>
+              <h3 className="text-xl font-bold text-white mb-2">IEEE Xplore</h3>
+              <p className="text-blue-100">High-quality proceedings now available on IEEE Xplore</p>
             </div>
           </div>
         </div>

@@ -148,22 +148,16 @@ export default function SpecialSessions() {
                 </a>
               </p>
               <p>
-                All manuscripts should be renamed as:{' '}
+                All manuscripts were renamed as:{' '}
                 <span className="font-mono bg-white/20 px-2 py-1 rounded text-white">
                   ResGenXAI_2025_ManuscriptShortTitle_SS01
                 </span>
               </p>
               <p>
-                Submit using the Microsoft CMT link at{' '}
-                <a href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025" className="text-blue-300 hover:text-blue-200 underline transition-colors">
-                  Be an Author
+                Submissions were managed through Microsoft CMT. The conference proceedings are now published on{' '}
+                <a href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding" className="text-blue-300 hover:text-blue-200 underline transition-colors">
+                  IEEE Xplore
                 </a>
-              </p>
-              <p>
-                After submission, forward to:{' '}
-                <span className="font-mono bg-white/20 px-2 py-1 rounded text-white text-sm">
-                amrutanshupanigrahi@soa.ac.in, abhilash.pati@soa.ac.in
-                </span>
               </p>
               <p>
                 Registration details:{' '}

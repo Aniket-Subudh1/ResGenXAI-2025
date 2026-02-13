@@ -137,12 +137,12 @@ export default function Header() {
                   </div>
                 ))}
                 <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-2 md:ml-2">
-                  <Link href="https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025">
-                    <Button className="bg-primary hover:bg-primary-600 text-white">Submit Paper</Button>
+                  <Link href="https://ieeexplore.ieee.org/xpl/conhome/11343984/proceeding">
+                    <Button className="bg-primary hover:bg-primary-600 text-white">View Proceedings</Button>
                   </Link>
                   <Link href="/registration">
                     <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
-                      Register Now
+                      Interest Form
                     </Button>
                   </Link>
                 </div>

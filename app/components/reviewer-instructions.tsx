@@ -22,9 +22,9 @@ export default function Registration() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 font-serif">Registration</h2>
           
           <div className="bg-white rounded-xl p-8 shadow-lg border border-primary/10 pattachitra-border">
-            <h3 className="text-2xl font-bold text-primary mb-6">Join Us at ResGenXAI 2025</h3>
-            <p className="text-gray-600 mb-8">
-              Register now to be part of the global community advancing responsible, generative, and explainable AI research.
+            <h3 className="text-2xl font-bold text-primary mb-6">ResGenXAI 2025 Successfully Concluded</h3>
+            <p className="text-gray-600 mb-6">
+              Thank you to all reviewers who participated in ResGenXAI 2025. Register your interest for future editions to continue being part of our AI research community.
             </p>
             
             {/* Registration Button */}

@@ -2,8 +2,7 @@ import Header from "./components/header"
 import Hero from "./components/hero"
 import AboutUniversity from "./components/about-university"
 import AboutConference from "./components/about-conference"
-import ImportantDates from "./components/important-dates"
-import Registration from "./components/registration"
+import Outcomes from "./components/outcomes"
 import CallToAction from "./components/call-to-action"
 
 import Footer from "./components/footer"
@@ -15,8 +14,7 @@ export default function Home() {
       <Hero />
       <AboutUniversity />
       <AboutConference />
-      <ImportantDates />
-      <Registration />
+      <Outcomes />
       <CallToAction />
     
       <Footer />

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Author Guidelines | ResGenXAI 2025",
-    description: "Comprehensive instructions for preparing and submitting your research paper to ResGenXAI 2025. IEEE formatting requirements, submission process, and publication guidelines.",
+    description: "Historical reference: Instructions used for preparing and submitting research papers to ResGenXAI 2025. IEEE formatting requirements, submission process, and publication guidelines.",
     url: "https://www.resgenxai.co.in/authorguidelines",
     images: [
       {
@@ -59,8 +59,8 @@ const jsonLd = {
     },
     {
       "@type": "HowToStep",
-      "name": "Submit Your Paper",
-      "text": "Submit your paper through the Microsoft CMT system. Ensure your submission is in PDF format and follows all formatting guidelines.",
+      "name": "Paper Submission (Historical)",
+      "text": "Papers were submitted through the Microsoft CMT system in PDF format following IEEE formatting guidelines. The conference has concluded and proceedings are now available on IEEE Xplore.",
       "url": "https://cmt3.research.microsoft.com/User/Login?ReturnUrl=%2FResGenXAI2025"
     },
     {

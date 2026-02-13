@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Call For Papers | ResGenXAI 2025",
-  description: "Submit your research on Responsible, Generative, and Explainable AI for ResGenXAI 2025. Paper submission deadline: June 20, 2025. IEEE Conference #64788.",
+  title: "Call For Papers (Archived) | ResGenXAI 2025",
+  description: "Archived call for papers from ResGenXAI 2025. The conference received 671 submissions from 8 countries with 67 high-quality papers published in IEEE Xplore. IEEE Conference #64788.",
   keywords: [
     "call for papers", 
     "AI conference submissions", 
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     "signal processing AI"
   ],
   openGraph: {
-    title: "Call For Papers | ResGenXAI 2025",
-    description: "Submit your research on Responsible, Generative, and Explainable AI for ResGenXAI 2025. IEEE Conference #64788.",
+    title: "Call For Papers (Archived) | ResGenXAI 2025",
+    description: "Archived call for papers from ResGenXAI 2025. The conference received 671 submissions from 8 countries with 67 papers published in IEEE Xplore.",
     url: "https://www.resgenxai.co.in/call-for-papers",
     images: [
       {
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Call For Papers | ResGenXAI 2025",
-  "description": "Submit your research on Responsible, Generative, and Explainable AI for ResGenXAI 2025. IEEE Conference #64788.",
+  "name": "Call For Papers (Archived) | ResGenXAI 2025",
+  "description": "Archived call for papers from ResGenXAI 2025 conference which received 671 submissions from 8 countries.",
   "url": "https://www.resgenxai.co.in/call-for-papers",
   "mainEntity": {
     "@type": "Event",

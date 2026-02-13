@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://www.resgenxai.co.in/",
     title: "ResGenXAI 2025 - International Conference on Responsible, Generative and Explainable AI",
-    description: "International Conference on Responsible, Generative and Explainable AI, September 10-12, 2025 in Bhubaneswar, Odisha",
+    description: "International Conference on Responsible, Generative and Explainable AI, held September 10-12, 2025 in Bhubaneswar, Odisha. 671 submissions, 67 papers published in IEEE Xplore.",
     siteName: "ResGenXAI 2025",
     images: [
       {
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ResGenXAI 2025 - International Conference on Responsible, Generative and Explainable AI",
-    description: "International Conference on Responsible, Generative and Explainable AI, September 10-12, 2025 in Bhubaneswar, Odisha",
+    description: "International Conference on Responsible, Generative and Explainable AI, held September 10-12, 2025 in Bhubaneswar, Odisha. 671 submissions, 67 papers published in IEEE Xplore.",
     images: ["/favicon.png"],
     creator: "@resgenxai",
     site: "@resgenxai",
